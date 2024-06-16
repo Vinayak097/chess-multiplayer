@@ -8,23 +8,21 @@ export interface GameInterface {
   player1: WebSocket,
   player2: WebSocket
 }
-interface gameinterface{
-  player1:WebSocket,
-  player2:WebSocket
-}
 
-export class GameManager extends Game {
-  private games;
+export class GameManager  {
+  private games:Game[];
   private pendingUser: WebSocket | null;
-  private users: WebSocket[];
+  private users:WebSocket[];
 
   constructor() {
-    this.games= GameInterface[];
-        
+    
+    this.games=[]
+    this.users=[]
+    this.pendingUser=null
   }
 
   addUser(socket: WebSocket) {  
-    this.users.push(socket);  
+    this.users.push(socket)
     this.addHandler(socket);
   }   
 
@@ -35,22 +33,30 @@ export class GameManager extends Game {
 
   private addHandler(socket: WebSocket) { 
     socket.on("message", (data: any) => {
+      console.log("message unparseddata messaage.type , ", data)
       const message = JSON.parse(data.toString());
+
       if (message.type === "init_game") { 
         if (this.pendingUser) {
           const game = new Game(this.pendingUser, socket);
           this.games.push(game);
+          if(game.player1){
+
+          }
           this.pendingUser = null;
         } else {
           this.pendingUser = socket;
         }
-      } else if (message.type === Move) {
-        const game=this.games.find(game=>game.player1===socket || game.player1===socket);
-        
-        
-            game.makeMove(socket,message.move);
-      
+      } 
+      if (message.type === Move) {
+        const game=this.games.find(game=>game.player1==socket || game.player1==socket);       
+        if(game){
+          game.makeMove(socket,message.move);
+        }
       }
+
+      
     });
   }
+  
 }
