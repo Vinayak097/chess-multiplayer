@@ -5,7 +5,7 @@ export class Game {
     public player1: WebSocket;
     public player2: WebSocket;
     private board: Chess; // Corrected from 'bord' to 'board'
-    
+    private moveCount=0;
     private startTime: Date;
   
     constructor(player1: WebSocket, player2: WebSocket) {
@@ -14,7 +14,6 @@ export class Game {
       this.board=new Chess();
       this.startTime=new Date();
       this.player1.send(JSON.stringify({type:init__game,payload:{color:"white"}}))    
-
       this.player2.send(JSON.stringify({type:init__game,payload:{color:"black"}}))
     } 
   
@@ -23,23 +22,27 @@ export class Game {
     }
     makeMove(socket:WebSocket,move:{from:string,to:string}){
       //validate moves 
-      if(this.board.moves().length%2==0 && socket!==this.player1){
+      console.log("validateing move")
+      console.log(this.board.moves().length , ' length of moves')
+      if(this.moveCount % 2===0 && socket !== this.player1){
         console.log("early return 1")
         return
       }
-      if(this.board.moves().length%2==1 && socket!==this.player2){
+      if(this.moveCount % 2 === 1 && socket !== this.player2){
         console.log("early return 2")
         return;
       }
       try{
-        console.log("before move ", this.board)
+        console.log("movess")
         this.board.move(move);
-        console.log("moved ", this.board)
+        console.log("move suceess")
+        
       }catch(error){
         console.log('error', error)
         return;
 
       }
+      console.log('game over check')
       if(this.board.isGameOver()){
         this.player1.emit(JSON.stringify({
            type:GAME_OVER,
@@ -55,21 +58,23 @@ export class Game {
        }))
         return;
       }
+      console.log("emits checks")
+      if(this.moveCount%2===0){
 
-      if(this.board.moves().length%2==0){
         console.log("emits moves")
         console.log("sent1")
-        this.player2.emit(JSON.stringify({
+        this.player2.send(JSON.stringify({
           type:Move,
           payload:move
         }))
        
       }else{
-        console.log("sent1")
-        this.player1.emit(JSON.stringify({type:Move,
+        console.log("sent2")
+        this.player1.send(JSON.stringify({type:Move,
           payload:move         
         }))
       }
+      this.moveCount++;
       
     }
     

@@ -18,14 +18,11 @@ class GameManager {
     }
     addHandler(socket) {
         socket.on("message", (data) => {
-            console.log("message unparseddata messaage.type , ", data);
             const message = JSON.parse(data.toString());
             if (message.type === "init_game") {
                 if (this.pendingUser) {
                     const game = new Game_1.Game(this.pendingUser, socket);
                     this.games.push(game);
-                    if (game.player1) {
-                    }
                     this.pendingUser = null;
                 }
                 else {
@@ -33,9 +30,14 @@ class GameManager {
                 }
             }
             if (message.type === message_1.Move) {
-                const game = this.games.find(game => game.player1 == socket || game.player1 == socket);
+                console.log(message.type);
+                const game = this.games.find(game => game.player1 == socket || game.player2 == socket);
                 if (game) {
+                    console.log("function call");
                     game.makeMove(socket, message.move);
+                }
+                else {
+                    console.log("not found game");
                 }
             }
         });

@@ -33,25 +33,27 @@ export class GameManager  {
 
   private addHandler(socket: WebSocket) { 
     socket.on("message", (data: any) => {
-      console.log("message unparseddata messaage.type , ", data)
+      
       const message = JSON.parse(data.toString());
-
+      
       if (message.type === "init_game") { 
         if (this.pendingUser) {
           const game = new Game(this.pendingUser, socket);
           this.games.push(game);
-          if(game.player1){
-
-          }
+          
           this.pendingUser = null;
         } else {
           this.pendingUser = socket;
         }
       } 
       if (message.type === Move) {
-        const game=this.games.find(game=>game.player1==socket || game.player1==socket);       
+        console.log(message.type)
+        const game=this.games.find(game=>game.player1==socket || game.player2==socket);       
         if(game){
+          console.log("function call")
           game.makeMove(socket,message.move);
+        }else{
+          console.log("not found game")
         }
       }
 
