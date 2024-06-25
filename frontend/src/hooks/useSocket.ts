@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-export const ws_url="ws://localhost:8080"
+export const ws_url="ws://localhost:8080";
 export const useSocket=()=>{
     const [socket,setSocket]=useState<WebSocket | null > ()
 
@@ -14,7 +14,9 @@ export const useSocket=()=>{
         }
 
         return ()=>{
+            
             ws.close();
+            
         }
         
     },[])

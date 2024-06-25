@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import Button from '../compoenents/Button'
 export const  Landing=()=> {
   const navigate=useNavigate()
   return (
@@ -12,7 +12,7 @@ export const  Landing=()=> {
         <div className=''>
           <div className='flex flex-col  items-center justify-center'>
           <div className=' text-3xl text-slate-600'>play chess online oht #2 site</div>
-          <button onClick={()=>{navigate("/game")}} className=' text-white f p-2 w-fit px-4 bg-green-500 hover:bg-green-600 rounded-sm mt-2'>play online</button>
+          <Button label='play online' onClick={()=>{navigate("/game")}}></Button>
           </div>
             
         </div>
