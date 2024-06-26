@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { Chess, Color, PieceSymbol, Square } from 'chess.js'
-import { json } from 'react-router-dom'
+import  { useState } from 'react'
+import {  Color, PieceSymbol, Square } from 'chess.js'
+
 import { Move } from '../screens/Game'
-const chess=new Chess()
+
 const Chessboard=({ chess,board, socket,setBoard}:{
   chess:any;
   board:({
@@ -28,12 +28,13 @@ const Chessboard=({ chess,board, socket,setBoard}:{
         {board.map((row,i)=>{
           return <div  key={i} className='flex justify-center '>
             {row.map((square,j)=>{
-              //const squareRepresantation=String.fromCharCode(65+(j%8))+""+(8-1) as Square;
+              const squareRepresantation=String.fromCharCode(65+(j%8))+""+(8-i) as Square
+              
               
               
               return <div  onClick={()=>{
                 if(!from){
-                  setform(square?.square)
+                  setform(squareRepresantation)
                 }else{
                  console.log(square)
                   socket?.send(JSON.stringify({
@@ -41,18 +42,18 @@ const Chessboard=({ chess,board, socket,setBoard}:{
                   
                       move:{
                         from,
-                      to:square?.square
+                      to:squareRepresantation
 
                       }
                       
                     
                   }))
                   console.log({from,
-                    to:square?.square})
+                    to:squareRepresantation})
                   setform(null)
                   chess.move({
                     from,
-                  to:square?.square
+                  to:squareRepresantation
 
                   })
                   setBoard(chess.board())

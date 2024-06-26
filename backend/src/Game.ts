@@ -4,7 +4,7 @@ import { GAME_OVER, Move, init__game } from "./message";
 export class Game {
     public player1: WebSocket;
     public player2: WebSocket;
-    private board: Chess; // Corrected from 'bord' to 'board'
+    private board: Chess; 
     private moveCount=0;
     private startTime: Date;
   
