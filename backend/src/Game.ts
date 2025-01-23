@@ -17,66 +17,58 @@ export class Game {
       this.player2.send(JSON.stringify({type:init__game,payload:{color:"black"}}))
     } 
   
-    joinGame() {
-      // Implementation of joinGame
-    }
-    makeMove(socket:WebSocket,move:{from:string,to:string}){
-      //validate moves 
-      console.log("validateing move")
-      console.log(this.board.moves().length , ' length of moves')
-      if(this.moveCount % 2===0 && socket !== this.player1){
-        console.log("early return 1")
-        return
-      }
-      if(this.moveCount % 2 === 1 && socket !== this.player2){
-        console.log("early return 2")
-        return;
-      }
-      try{
-        console.log("movess")
-        this.board.move(move);
-        console.log("move suceess")
-        
-      }catch(error){
-        console.log('error', error)
-        return;
+   
+    makeMove(socket: WebSocket, move: { from: string, to: string }) {
+      try {
+        const result = this.board.move({
+          from: move.from,
+          to: move.to
+        })
 
-      }
-      console.log('game over check')
-      if(this.board.isGameOver()){
-        this.player1.emit(JSON.stringify({
-           type:GAME_OVER,
-           payload:{
-            winner:this.board.turn()==="w"?"black":"white"
-           }
-        }))
-        this.player2.emit(JSON.stringify({
-          type:GAME_OVER,
-          payload:{
-           winner:this.board.turn()==="w"?"black":"white"
-          }
-       }))
-        return;
-      }
-      console.log("emits checks")
-      if(this.moveCount%2===0){
+        if (!result) {
+          console.log("Invalid move")
+          return
+        }
 
-        console.log("emits moves")
-        console.log("sent1")
-        this.player2.send(JSON.stringify({
-          type:Move,
-          payload:move
-        }))
-       
-      }else{
-        console.log("sent2")
-        this.player1.send(JSON.stringify({type:Move,
-          payload:move         
-        }))
+        // Send move to BOTH players
+        const moveMessage = JSON.stringify({
+          type: Move,
+          payload: move
+        })
+
+        this.player1.send(moveMessage)
+        this.player2.send(moveMessage)
+
+        this.moveCount++
+        console.log("Board after move:\n" + this.board.ascii())
+
+      } catch (error) {
+        console.error('Move error:', error)
       }
-      this.moveCount++;
-      
     }
-    
-  }
-  
+    private getGameOverReason(): string {
+      if (this.board.isCheckmate()) return "checkmate";
+      if (this.board.isDraw()) return "draw";
+      if (this.board.isStalemate()) return "stalemate";
+      if (this.board.isThreefoldRepetition()) return "threefold repetition";
+      if (this.board.isInsufficientMaterial()) return "insufficient material";
+      return "unknown";
+    }
+
+    public isValidMove(from: string, to: string): boolean {
+      try {
+        const moves = this.board.moves({ verbose: true });
+        return moves.some(move => move.from === from && move.to === to);
+      } catch {
+        return false;
+      }
+    }
+
+    public getCurrentTurn(): 'white' | 'black' {
+      return this.board.turn() === 'w' ? 'white' : 'black';
+    }
+
+    public getGameDuration(): number {
+      return Date.now() - this.startTime.getTime();
+    }
+}

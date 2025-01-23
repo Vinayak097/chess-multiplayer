@@ -1,60 +1,107 @@
 import React, { useEffect, useState } from 'react'
 import Chessboard from '../compoenents/chessboard'
 import { useSocket } from '../hooks/useSocket'
-import { Chess } from 'chess.js';
-import { json } from 'react-router-dom';
-export const Move="move"
-export const init_game="init_game"
-export const GAME_OVER="game_over"
+import { Chess } from 'chess.js'
+import Button from '../compoenents/Button'
+
+export const Move = "move"
+export const init_game = "init_game"
+export const GAME_OVER = "game_over"
+
 function Game() {
-  const socket:WebSocket|null|any=useSocket();
-  const [chess ,setChess]=useState(new Chess())
-  const [board,setBoard]=useState(chess.board())
-  useEffect(()=>{
-    if(socket){
-      socket.onmessage=(event: { data: string; })=>{
-        const message=JSON.parse(event.data);
-        console.log(message)
-        switch(message.type){
-          case init_game:
-       
-            setBoard(chess.board())
-            console.log("game initiated")
-            break;
-          case Move:
-            const move=message.move;
-            chess.move(move)
-            setBoard(chess.board())
-            console.log("Move made")
-            break;
-          case GAME_OVER:
-            console.log("game over")
-            break;
-        }
+  const socket = useSocket();
+  const [chess] = useState(() => new Chess());
+  const [board, setBoard] = useState(() => chess.board());
+  const [turn, setTurn] = useState('w');
+  const [isConnected, setIsConnected] = useState(false)
+  const [gameStatus, setGameStatus] = useState('Waiting to start...')
+
+  useEffect(() => {
+    if (!socket) return
+
+    setIsConnected(true)
+    
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data)
+      console.log("Received message:", message); // Debug log
+      
+      switch (message.type) {
+        case init_game:
+          chess.reset();
+          setBoard([...chess.board()]); // Force update with spread
+          setTurn('w');
+          setGameStatus('Game started!')
+          break
+        case Move:
+          try {
+            const moveResult = chess.move({
+              from: message.payload.move.from,
+              to: message.payload.move.to
+            });
+            
+            if (moveResult) {
+              // Force a new array reference to trigger re-render
+              const newBoard = chess.board();
+              setBoard([...newBoard]);
+              console.log("Board updated:", chess.ascii()); // Debug log
+            }
+          } catch (err) {
+            console.error("Move error:", err);
+          }
+          break
       }
     }
-  })
+
+    return () => {
+      socket.onmessage = null;
+    };
+
+  }, [socket, chess])
+
+  const handleMove = (move: { from: string, to: string }) => {
+    socket.send(JSON.stringify({
+      type: Move,
+      move: move
+    }));
+  };
+
   return (
-    <div>
-
-    
-    <div className='flex justify-center bg-slate-900 h-screen  '>
-      <div className='pt-8 max-w-screen-lg  w-full '>
-        <div className='grid grid-cols-6 gap-4  '>
-        <div className='  col-span-3  bg-slate-700  w-full'>
-          <Chessboard chess={chess} setBoard={setBoard} socket={socket} board={board}></Chessboard>
-        </div>
-        <div className='col-span-2 bg-slate-700 text-white w-full flex flex-col gap-4 items-center  rounded-md' >
-          <select name="timstamp" id="timestamp" className='mt-8 w-48 p-2 bg-slate-500 text-white  '>time 00</select>
-          <button onClick={()=>{
-            socket?.send(JSON.stringify({type:init_game}))
-          }} className='bg-green-500 hover:bg-green-600 p-2 w-48 rounded-md'>Play</button>
+    <div className="min-h-screen bg-slate-900 p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-4 gap-8">
+          <div className="col-span-3">
+            <div className="bg-slate-800 p-6 rounded-lg">
+              {isConnected ? (
+                <Chessboard 
+                  socket={socket} 
+                  chess={chess} 
+                  board={board} 
+                  onMove={handleMove}
+                  currentTurn={turn}
+                />
+              ) : (
+                <div className="text-white text-center p-8">Connecting...</div>
+              )}
+            </div>
+          </div>
           
+          <div className="bg-slate-800 p-6 rounded-lg">
+            <div className="text-white space-y-4">
+              <div className={`text-sm ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
+                {isConnected ? 'Connected' : 'Disconnected'}
+              </div>
+              <div className="text-lg font-semibold">{gameStatus}</div>
+              <Button 
+                label="Start Game" 
+                onClick={() => {
+                  socket?.send(JSON.stringify({ type: init_game }))
+                  setGameStatus('Starting game...')
+                }}
+              />
+            </div>
+          </div>
         </div>
-        </div>
-
-        </div>
-     </div>
+      </div>
     </div>
   )
 }
