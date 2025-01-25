@@ -14,16 +14,6 @@ class Game {
         this.player2.send(JSON.stringify({ type: message_1.init__game, payload: { color: "black" } }));
     }
     makeMove(socket, move) {
-        // Validate player turn
-        if (this.moveCount % 2 === 0 && socket !== this.player1) {
-            console.log("Not white player's turn");
-            return;
-        }
-        if (this.moveCount % 2 === 1 && socket !== this.player2) {
-            console.log("Not black player's turn");
-            return;
-        }
-        // Make move
         try {
             const result = this.board.move({
                 from: move.from,
@@ -33,37 +23,23 @@ class Game {
                 console.log("Invalid move");
                 return;
             }
-            console.log(`Move made: ${move.from} to ${move.to}`);
-            console.log(this.board.ascii());
-            // Send move to opponent
+            // Send move to BOTH players
             const moveMessage = JSON.stringify({
                 type: message_1.Move,
-                payload: move
+                payload: {
+                    move: move,
+                    board: this.board.board(),
+                    turn: this.board.turn(),
+                    fen: this.board.fen()
+                }
             });
-            if (this.moveCount % 2 === 0) {
-                this.player2.send(moveMessage);
-            }
-            else {
-                this.player1.send(moveMessage);
-            }
+            this.player1.send(moveMessage);
+            this.player2.send(moveMessage);
             this.moveCount++;
-            // Check game end conditions
-            if (this.board.isGameOver()) {
-                const gameOverMessage = JSON.stringify({
-                    type: message_1.GAME_OVER,
-                    payload: {
-                        winner: this.board.turn() === 'w' ? "black" : "white",
-                        reason: this.getGameOverReason()
-                    }
-                });
-                this.player1.send(gameOverMessage);
-                this.player2.send(gameOverMessage);
-                return;
-            }
+            console.log("Board after move:\n" + this.board.ascii());
         }
         catch (error) {
             console.error('Move error:', error);
-            return;
         }
     }
     getGameOverReason() {

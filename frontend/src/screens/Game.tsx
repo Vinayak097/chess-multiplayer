@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from 'react'
-import Chessboard from '../compoenents/chessboard'
-import { useSocket } from '../hooks/useSocket'
-import { Chess } from 'chess.js'
-import Button from '../compoenents/Button'
+import React, { useEffect, useState } from 'react';
+import Chessboard from '../compoenents/chessboard';
+import { useSocket } from '../hooks/useSocket';
+import { Chess } from 'chess.js';
+import Button from '../compoenents/Button';
 
-export const Move = "move"
-export const init_game = "init_game"
-export const GAME_OVER = "game_over"
+export const Move = "move";
+export const init_game = "init_game";
+export const GAME_OVER = "game_over";
 
 function Game() {
   const socket = useSocket();
   const [chess] = useState(() => new Chess());
   const [board, setBoard] = useState(() => chess.board());
   const [turn, setTurn] = useState('w');
-  const [isConnected, setIsConnected] = useState(false)
-  const [gameStatus, setGameStatus] = useState('Waiting to start...')
+  const [isConnected, setIsConnected] = useState(false);
+  const [gameStatus, setGameStatus] = useState('Waiting to start...');
+  const [winner, setWinner] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!socket) return
+    if (!socket) return;
 
-    setIsConnected(true)
+    setIsConnected(true);
     
     socket.onmessage = (event) => {
-      const message = JSON.parse(event.data)
+      const message = JSON.parse(event.data);
       console.log("Received message:", message); // Debug log
       
       switch (message.type) {
@@ -30,8 +31,9 @@ function Game() {
           chess.reset();
           setBoard([...chess.board()]); // Force update with spread
           setTurn('w');
-          setGameStatus('Game started!')
-          break
+          setGameStatus('Game started!');
+          setWinner(null);
+          break;
         case Move:
           try {
             const moveResult = chess.move({
@@ -43,20 +45,25 @@ function Game() {
               // Force a new array reference to trigger re-render
               const newBoard = chess.board();
               setBoard([...newBoard]);
+              setTurn(message.payload.turn);
               console.log("Board updated:", chess.ascii()); // Debug log
             }
           } catch (err) {
             console.error("Move error:", err);
           }
-          break
+          break;
+        case GAME_OVER:
+          setGameStatus(`Game Over! Winner: ${message.payload.winner}`);
+          setWinner(message.payload.winner);
+          break;
       }
-    }
+    };
 
     return () => {
       socket.onmessage = null;
     };
 
-  }, [socket, chess])
+  }, [socket, chess]);
 
   const handleMove = (move: { from: string, to: string }) => {
     socket.send(JSON.stringify({
@@ -91,11 +98,16 @@ function Game() {
                 {isConnected ? 'Connected' : 'Disconnected'}
               </div>
               <div className="text-lg font-semibold">{gameStatus}</div>
+              {winner && (
+                <div className="text-xl font-bold">
+                  Winner: {winner}
+                </div>
+              )}
               <Button 
                 label="Start Game" 
                 onClick={() => {
-                  socket?.send(JSON.stringify({ type: init_game }))
-                  setGameStatus('Starting game...')
+                  socket?.send(JSON.stringify({ type: init_game }));
+                  setGameStatus('Starting game...');
                 }}
               />
             </div>
@@ -103,7 +115,7 @@ function Game() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Game
+export default Game;

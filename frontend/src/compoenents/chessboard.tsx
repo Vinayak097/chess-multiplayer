@@ -1,36 +1,47 @@
-import { Color, PieceSymbol, Square } from 'chess.js'
-import { useState, useEffect } from 'react'
+import { Color, PieceSymbol, Square } from 'chess.js';
+import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChessKing, faChessQueen, faChessRook, faChessBishop, faChessKnight, faChessPawn } from '@fortawesome/free-solid-svg-icons';
 
-const getPieceSymbol = (piece: { type: PieceSymbol, color: Color }) => {
-  const symbols: { [key: string]: string } = {
-    'wk': '♔', 'wq': '♕', 'wr': '♖', 'wb': '♗', 'wn': '♘', 'wp': '♙',
-    'bk': '♚', 'bq': '♛', 'br': '♜', 'bb': '♝', 'bn': '♞', 'bp': '♟'
-  }
-  return symbols[piece.color + piece.type]
-}
+const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
+  const pieceMap: { [key: string]: any } = {
+    'wk': faChessKing,
+    'wq': faChessQueen,
+    'wr': faChessRook,
+    'wb': faChessBishop,
+    'wn': faChessKnight,
+    'wp': faChessPawn,
+    'bk': faChessKing,
+    'bq': faChessQueen,
+    'br': faChessRook,
+    'bb': faChessBishop,
+    'bn': faChessKnight,
+    'bp': faChessPawn,
+  };
+  return pieceMap[piece.color + piece.type];
+};
 
-const Chessboard = ({chess, socket, board}: {
-  chess:any,
-  socket:WebSocket
+const Chessboard = ({ chess, socket, board, onMove, currentTurn }: {
+  chess: any,
+  socket: WebSocket,
   board: ({
     square: Square,
     type: PieceSymbol,
     color: Color
-  } | null)[][];
+  } | null)[][],
+  onMove: (move: { from: string, to: string }) => void,
+  currentTurn: string
 }) => {
-  const [selectedSquare, setSelectedSquare] = useState<string | null>(null)
+  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
 
   const handleSquareClick = (square: string) => {
     if (!selectedSquare) {
       setSelectedSquare(square);
     } else {
-      socket.send(JSON.stringify({
-        type: "move",
-        move: {
-          from: selectedSquare,
-          to: square
-        }
-      }));
+      onMove({
+        from: selectedSquare,
+        to: square
+      });
       setSelectedSquare(null);
     }
   };
@@ -57,9 +68,10 @@ const Chessboard = ({chess, socket, board}: {
                 `}
               >
                 {square && 
-                  <span className={`${square.color === 'w' ? 'text-white' : 'text-black'}`}>
-                    {getPieceSymbol(square)}
-                  </span>
+                  <FontAwesomeIcon 
+                    icon={getPieceIcon(square)} 
+                    className={`${square.color === 'w' ? 'text-white' : 'text-black'}`}
+                  />
                 }
               </div>
             );
@@ -70,4 +82,4 @@ const Chessboard = ({chess, socket, board}: {
   );
 };
 
-export default Chessboard
+export default Chessboard;
