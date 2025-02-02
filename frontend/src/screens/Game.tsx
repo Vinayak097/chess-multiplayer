@@ -31,7 +31,7 @@ function Game() {
           chess.reset();
           setBoard([...chess.board()]); // Force update with spread
           setTurn('w');
-          setGameStatus('Game started!');
+          setGameStatus('Game started!' +message.payload.color);
           setWinner(null);
           break;
         case Move:

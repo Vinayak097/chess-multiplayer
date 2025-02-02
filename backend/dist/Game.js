@@ -37,6 +37,20 @@ class Game {
             this.player2.send(moveMessage);
             this.moveCount++;
             console.log("Board after move:\n" + this.board.ascii());
+            // Check for game over
+            if (this.board.isGameOver()) {
+                const winner = this.board.turn() === 'w' ? 'black' : 'white';
+                const gameOverMessage = JSON.stringify({
+                    type: message_1.GAME_OVER,
+                    payload: {
+                        winner: winner,
+                        reason: this.getGameOverReason()
+                    }
+                });
+                this.player1.send(gameOverMessage);
+                this.player2.send(gameOverMessage);
+                console.log(`Game over! Winner: ${winner}`);
+            }
         }
         catch (error) {
             console.error('Move error:', error);

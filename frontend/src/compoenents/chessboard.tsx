@@ -63,7 +63,7 @@ const Chessboard = ({ chess, socket, board, onMove, currentTurn }: {
                 onClick={() => handleSquareClick(squareId)}
                 className={`
                   w-16 h-16 flex items-center justify-center text-4xl
-                  ${(i + j) % 2 === 0 ? 'bg-slate-200' : 'bg-slate-500'}
+                  ${(i + j) % 2 === 0 ? 'bg-green-200' : 'bg-slate-500'}
                   ${selectedSquare === squareId ? 'bg-blue-400' : ''}
                 `}
               >
