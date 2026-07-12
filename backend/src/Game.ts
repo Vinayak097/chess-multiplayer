@@ -1,96 +1,34 @@
-import WebSocket from "ws";
-import { Chess } from "chess.js";
-import { GAME_OVER, Move, init__game } from "./message";
+import { Chess, Move } from "chess.js";
 
-export class Game {
-  public player1: WebSocket;
-  public player2: WebSocket;
-  private board: Chess;
-  private moveCount = 0;
-  private startTime: Date;
+enum Status{
+    waiting="wating",
+    game="inGame",
+    ended="ended"
+}
 
-  constructor(player1: WebSocket, player2: WebSocket) {
-    this.player1 = player1;
-    this.player2 = player2;
-    this.board = new Chess();
-    this.startTime = new Date();
-    this.player1.send(JSON.stringify({ type: init__game, payload: { color: "white" } }));
-    this.player2.send(JSON.stringify({ type: init__game, payload: { color: "black" } }));
-  }
+export class Game{
+    id:string;
+    status:string;
+    player1:string|null;
+    player2:string|null;
+    chess:Chess;
 
-  makeMove(socket: WebSocket, move: { from: string, to: string }) {
-    try {
-      const result = this.board.move({
-        from: move.from,
-        to: move.to
-      });
-
-      if (!result) {
-        console.log("Invalid move");
-        return;
-      }
-
-      // Send move to BOTH players
-      const moveMessage = JSON.stringify({
-        type: Move,
-        payload: {
-          move: move,
-          board: this.board.board(),
-          turn: this.board.turn(),
-          fen: this.board.fen()
-        }
-      });
-
-      this.player1.send(moveMessage);
-      this.player2.send(moveMessage);
-
-      this.moveCount++;
-      console.log("Board after move:\n" + this.board.ascii());
-
-      // Check for game over
-      if (this.board.isGameOver()) {
-        const winner = this.board.turn() === 'w' ? 'black' : 'white';
-        const gameOverMessage = JSON.stringify({
-          type: GAME_OVER,
-          payload: {
-            winner: winner,
-            reason: this.getGameOverReason()
-          }
-        });
-
-        this.player1.send(gameOverMessage);
-        this.player2.send(gameOverMessage);
-        console.log(`Game over! Winner: ${winner}`);
-      }
-
-    } catch (error) {
-      console.error('Move error:', error);
+    constructor(id:string,player1:string,){
+        this.id=id
+        this.status=Status.waiting
+        this.player1=player1,
+        this.player2=null,
+        this.chess= new Chess()
     }
-  }
-
-  private getGameOverReason(): string {
-    if (this.board.isCheckmate()) return "checkmate";
-    if (this.board.isDraw()) return "draw";
-    if (this.board.isStalemate()) return "stalemate";
-    if (this.board.isThreefoldRepetition()) return "threefold repetition";
-    if (this.board.isInsufficientMaterial()) return "insufficient material";
-    return "unknown";
-  }
-
-  public isValidMove(from: string, to: string): boolean {
-    try {
-      const moves = this.board.moves({ verbose: true });
-      return moves.some(move => move.from === from && move.to === to);
-    } catch {
-      return false;
+    makemove(move:Move){
+        //validation
+        //check whos turn is this 
+        //make changes to the board with that move 
+        //check winnerr if so return winner somhow 
+        //and return the chess
     }
-  }
+    addPlayer(id:string,player2:string){
+        
 
-  public getCurrentTurn(): 'white' | 'black' {
-    return this.board.turn() === 'w' ? 'white' : 'black';
-  }
-
-  public getGameDuration(): number {
-    return Date.now() - this.startTime.getTime();
-  }
+    }
 }
