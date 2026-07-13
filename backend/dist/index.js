@@ -58,11 +58,13 @@ io.on('connection', (socket) => {
         }
     });
     socket.on("move", (playload) => {
-        console.log("move ");
+        console.log("move payload:", playload);
+        console.log("known game ids:", gameManager.game.map(g => g.id));
+        console.log("matching gameId:", playload.gameId, gameManager.game.some(g => g.id === playload.gameId));
         const game = gameManager.getGame(playload.gameId);
         console.log(game, 'game found');
         if (!game) {
-            socket.emit("gamenotfound");
+            socket.emit("gamenotfound", { receivedGameId: playload.gameId });
             return;
         }
         const move = game.makemove(playload.move);

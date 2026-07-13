@@ -14,25 +14,23 @@ class GameManager {
     }
     getGame(id) {
         console.log("gameds ", this.game);
-        const game = this.game.find(game => game.id == id);
+        const game = this.game.find(game => game.id === id);
         return game;
     }
     removeGame(id) {
-        const filter = this.game.filter(game => game.id == id);
+        this.game = this.game.filter(game => game.id !== id);
     }
     isPlayerinGame(player) {
-        const foundgame = this.game.filter(game => { var _a; return ((_a = game.player1) === null || _a === void 0 ? void 0 : _a.id) == player; });
-        console.log(foundgame, "aleradhy in game ", player);
-        if (foundgame.length > 1)
-            return true;
-        return false;
+        const foundgame = this.game.filter(game => { var _a, _b; return ((_a = game.player1) === null || _a === void 0 ? void 0 : _a.id) === player || ((_b = game.player2) === null || _b === void 0 ? void 0 : _b.id) === player; });
+        console.log(foundgame, "already in game", player);
+        return foundgame.length > 0;
     }
     joinGame(player) {
         var _a;
-        const game = this.game.find(game => game.status == game_1.GameStatus.waiting);
+        const game = this.game.find(game => game.status === game_1.GameStatus.waiting);
         const isingame = this.isPlayerinGame(player.id);
         if (isingame)
-            throw new Error("alerady in game");
+            throw new Error("already in game");
         if (!game) {
             const id = (0, uuid_1.v4)();
             const game = new game_1.Game(id, player);
@@ -42,9 +40,10 @@ class GameManager {
             };
         }
         else {
-            if (((_a = game.player1) === null || _a === void 0 ? void 0 : _a.socket) == player.socket) {
+            if (((_a = game.player1) === null || _a === void 0 ? void 0 : _a.socket) === player.socket) {
                 return { game };
             }
+            player.color = 'b';
             game.addPlayer(player);
         }
         return {

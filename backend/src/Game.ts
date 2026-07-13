@@ -2,7 +2,7 @@ import { Chess, Move } from "chess.js";
 import { Socket } from "socket.io";
 
 export enum GameStatus{
-    waiting="wating",
+    waiting="waiting",
     inGame="inGame",
     ended="ended"
 }

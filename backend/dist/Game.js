@@ -4,7 +4,7 @@ exports.Game = exports.GameStatus = void 0;
 const chess_js_1 = require("chess.js");
 var GameStatus;
 (function (GameStatus) {
-    GameStatus["waiting"] = "wating";
+    GameStatus["waiting"] = "waiting";
     GameStatus["inGame"] = "inGame";
     GameStatus["ended"] = "ended";
 })(GameStatus || (exports.GameStatus = GameStatus = {}));
