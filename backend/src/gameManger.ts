@@ -18,7 +18,9 @@ export class GameManager{
     }
     getGame(id:string){
         console.log("gameds " , this.game)
+        
         const game = this.game.find(game => game.id === id)
+        console.log("game id  " ,id , " , game found :", game )
         return game
     }
     removeGame(id:string){

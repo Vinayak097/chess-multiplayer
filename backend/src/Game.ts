@@ -11,6 +11,7 @@ export type Player={
     id:string,
     socket:Socket
 }
+
 export class Game{
     id:string;
     status:string;

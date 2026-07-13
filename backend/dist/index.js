@@ -22,7 +22,7 @@ io.on('connection', (socket) => {
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
         var _a;
-        console.log(p, "joing game recienved");
+        console.log(p, "joing game recienved", p.id);
         const player = {
             id: p.id || (0, uuid_1.v4)(),
             color: 'w',
@@ -58,16 +58,14 @@ io.on('connection', (socket) => {
         }
     });
     socket.on("move", (playload) => {
-        console.log("move payload:", playload);
-        console.log("known game ids:", gameManager.game.map(g => g.id));
-        console.log("matching gameId:", playload.gameId, gameManager.game.some(g => g.id === playload.gameId));
-        const game = gameManager.getGame(playload.gameId);
-        console.log(game, 'game found');
+        const data = JSON.parse(playload);
+        const game = gameManager.getGame(data.gameId);
+        console.log(game, 'returned game ');
         if (!game) {
-            socket.emit("gamenotfound", { receivedGameId: playload.gameId });
+            socket.emit("gamenotfound", { receivedGameId: data.gameId });
             return;
         }
-        const move = game.makemove(playload.move);
+        const move = game.makemove(data.move);
         if (!move) {
             console.log("invalid move ");
             return;
@@ -80,8 +78,8 @@ io.on('connection', (socket) => {
         console.log("emiteted ");
         const res = io.sockets.adapter.rooms.get(game.id);
         console.log('res game paritcipants  ', res);
-        io.to(playload.gameId).emit("move-made", {
-            gameId: playload.gameId,
+        io.to(data.gameId).emit("move-made", {
+            gameId: data.gameId,
             fen: game.chess.fen(),
             turn: game.chess.turn(),
             gameOver: game.chess.isGameOver(),
