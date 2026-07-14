@@ -1,121 +1,83 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react'
+import { useState ,useEffect} from 'react'
+import { socket } from '../socket'
+import { Chess } from "chess.js";
 import Chessboard from '../compoenents/chessboard';
-import { useSocket } from '../hooks/useSocket';
-import { Chess } from 'chess.js';
-import Button from '../compoenents/Button';
+const Game = () => {
+  
+  const [chess,setChess]=useState<any>(null)
+  const [board,setBoard]=useState(new Chess().board())
+const [turn, setTurn] = useState("w")
+const [color, setColor] = useState()
+const [gameId, setGameId] = useState("")
 
-export const Move = "move";
-export const init_game = "init_game";
-export const GAME_OVER = "game_over";
 
-function Game() {
-  const socket = useSocket();
-  const [chess] = useState(() => new Chess());
-  const [board, setBoard] = useState(() => chess.board());
-  const [turn, setTurn] = useState('w');
-  const [isConnected, setIsConnected] = useState(false);
-  const [gameStatus, setGameStatus] = useState('Waiting to start...');
-  const [winner, setWinner] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!socket) return;
+useEffect(() => {
+  
 
-    setIsConnected(true);
-    
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("Received message:", message); // Debug log
+    socket.on("waiting", (data) => {
+      setGameId(data.gameId)
+        console.log(data,);
+        
+    });
+
+    socket.on("game-start", (data) => {
       
-      switch (message.type) {
-        case init_game:
-          chess.reset();
-          setBoard([...chess.board()]); // Force update with spread
-          setTurn('w');
-          setGameStatus('Game started!' +message.payload.color);
-          setWinner(null);
-          break;
-        case Move:
-          try {
-            const moveResult = chess.move({
-              from: message.payload.move.from,
-              to: message.payload.move.to
-            });
-            
-            if (moveResult) {
-              // Force a new array reference to trigger re-render
-              const newBoard = chess.board();
-              setBoard([...newBoard]);
-              setTurn(message.payload.turn);
-              console.log("Board updated:", chess.ascii()); // Debug log
-            }
-          } catch (err) {
-            console.error("Move error:", err);
-          }
-          break;
-        case GAME_OVER:
-          setGameStatus(`Game Over! Winner: ${message.payload.winner}`);
-          setWinner(message.payload.winner);
-          break;
-      }
-    };
+      setGameId(data.gameId)
+      setTurn(data.color)
+      setChess(new Chess(data.fen)) 
+      setBoard(chess.board());
+      console.log("data" , data)
+    });
+
+    socket.on("move-made", (data) => {
+        const chess = new Chess(data.fen);
+        setChess(chess);
+    setBoard(chess.board());
+    setTurn(data.turn);
+    });
 
     return () => {
-      socket.onmessage = null;
+        socket.off("waiting");
+        socket.off("game-start");
+        socket.off("move-made");
     };
 
-  }, [socket, chess]);
+}, []);
+function onMove(move:{from:string,to:string}){
+  socket.emit('move',{
+    gameId:gameId,
+    move
+  })
+  console.log("move emited ", move)
 
-  const handleMove = (move: { from: string, to: string }) => {
-    socket.send(JSON.stringify({
-      type: Move,
-      move: move
-    }));
-  };
-
+}
+const JoinGame=()=>{
+  console.log("joined game clikec " , socket)
+  const id=crypto.randomUUID()
+  socket.emit("join-game",{id})
+}
   return (
-    <div className="min-h-screen bg-slate-900 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-4 gap-8">
-          <div className="col-span-3">
-            <div className="bg-slate-800 p-6 rounded-lg">
-              {isConnected ? (
-                <Chessboard 
-                  socket={socket} 
-                  chess={chess} 
-                  board={board} 
-                  onMove={handleMove}
-                  currentTurn={turn}
-                />
-              ) : (
-                <div className="text-white text-center p-8">Connecting...</div>
-              )}
-            </div>
-          </div>
-          
-          <div className="bg-slate-800 p-6 rounded-lg">
-            <div className="text-white space-y-4">
-              <div className={`text-sm ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
-                {isConnected ? 'Connected' : 'Disconnected'}
-              </div>
-              <div className="text-lg font-semibold">{gameStatus}</div>
-              {winner && (
-                <div className="text-xl font-bold">
-                  Winner: {winner}
-                </div>
-              )}
-              <Button 
-                label="Start Game" 
-                onClick={() => {
-                  socket?.send(JSON.stringify({ type: init_game }));
-                  setGameStatus('Starting game...');
-                }}
-              />
-            </div>
-          </div>
-        </div>
+    <div className=' h-screen w-full  '>
+      <nav className='w-full text-center p-5'>
+      <h1 className='text-green-500 bg-background'>Open Chess</h1>
+      </nav>
+      <div className='w-full h-full '>
+       
+          {/* chess board  */}
+          <Chessboard socket={socket} chess={chess} board={board} currentTurn={turn}   onMove={onMove }></Chessboard>
+        
+      
+
+      <button onClick={()=>{JoinGame()}}>play</button>
+
       </div>
+      
     </div>
-  );
+  )
 }
 
-export default Game;
+export default Game
+
+

@@ -11,7 +11,12 @@ const gameManger_1 = require("./gameManger");
 const game_1 = require("./game");
 const server = http_1.default.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+    }
+});
 const gameManager = new gameManger_1.GameManager();
 app.get("/health", (res) => {
     console.log("fine");

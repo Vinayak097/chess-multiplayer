@@ -5,7 +5,7 @@ export const  Landing=()=> {
   const navigate=useNavigate()
   return (
     <div className='flex p-8  bg-slate-900 md:flex-row flex-col items-center md:justify-center gap-4'>
-
+        
         <div className='' >
             <img className='w-64' src="images/ChessBoard2.jpg" alt="" />
         </div>

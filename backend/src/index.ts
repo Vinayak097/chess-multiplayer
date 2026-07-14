@@ -15,7 +15,12 @@ type MovePayload={
 }
     const server= http.createServer(app)
     const {Server} =require("socket.io")
-    const io= new Server(server)
+    const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+    }
+});
     const gameManager = new GameManager()
 
     app.get("/health",(res:Response)=>{

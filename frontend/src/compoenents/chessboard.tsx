@@ -2,6 +2,7 @@ import { Color, PieceSymbol, Square } from 'chess.js';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChessKing, faChessQueen, faChessRook, faChessBishop, faChessKnight, faChessPawn } from '@fortawesome/free-solid-svg-icons';
+import { Socket } from 'socket.io-client';
 
 const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   const pieceMap: { [key: string]: any } = {
@@ -23,7 +24,7 @@ const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
 
 const Chessboard = ({ chess, socket, board, onMove, currentTurn }: {
   chess: any,
-  socket: WebSocket,
+  socket: Socket,
   board: ({
     square: Square,
     type: PieceSymbol,
