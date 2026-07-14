@@ -31,11 +31,18 @@ class Game {
             console.log("not your turn ", playerId);
             return;
         }
-        // 3. Make move
-        const playedMove = this.chess.move(move);
+        // 3. Make move (guard against chess.js throwing on invalid input)
+        let playedMove = null;
+        try {
+            playedMove = this.chess.move(move);
+        }
+        catch (err) {
+            console.log("invalid move (exception)", move, err);
+            return null;
+        }
         if (!playedMove) {
             console.log("invalid move ", move);
-            return;
+            return null;
         }
         // 4. Update game status
         if (this.chess.isGameOver()) {

@@ -10,6 +10,7 @@ const Game = () => {
 const [turn, setTurn] = useState("w")
 const [gameId, setGameId] = useState("")
 const [playerId,setPlayerId]=useState<string>("")
+const [winner,setWinner]=useState<null|string>(null)
 
 useEffect(() => {
   
@@ -30,10 +31,14 @@ useEffect(() => {
     });
 
     socket.on("move-made", (data) => {
+
         const chess = new Chess(data.fen);
         setChess(chess);
     setBoard(chess.board());
     setTurn(data.turn);
+    if(data.gameOver){
+      setWinner(data.winner)
+    }
     });
 
     return () => {
@@ -43,6 +48,8 @@ useEffect(() => {
     };
 
 }, []);
+
+
 function onMove(move:{from:string,to:string}){
   console.log("playeid sending " , playerId)
   socket.emit('move',{
@@ -67,10 +74,12 @@ function JoinGame(){
         </h1>
     </nav>
 
+
     <div className="flex h-[calc(100vh-88px)]">
 
         {/* Chess Board */}
         <div className="flex-1 flex justify-center items-center">
+          
             <Chessboard
             chess={chess}
             board={board}
@@ -80,7 +89,7 @@ function JoinGame(){
 
         {/* Side Panel */}
         <div className="w-80 border-l border-border bg-card">
-            <SidePannel  onGameStart={JoinGame} />
+            <SidePannel  onGameStart={JoinGame}  />
         </div>
 
     </div>

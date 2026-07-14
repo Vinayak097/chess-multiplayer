@@ -34,11 +34,16 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   currentTurn: string
 }) => {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
-
+  const[winner,setWinner]=useState<null|string>()
+  const [fmoves,setFmoves]=useState<any[]>([])
   const handleSquareClick = (square: string) => {
+    console.log("selectedsquare" , selectedSquare ,square)
     if (!selectedSquare) {
       setSelectedSquare(square);
+      setFmoves(_chess.move({square:selectedSquare,verbose:true}))
+
     } else {
+
       onMove({
         from: selectedSquare,
         to: square
@@ -50,23 +55,34 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   // Force re-render when board changes
   useEffect(() => {
     console.log("Board updated in Chessboard:", board); // Debug log
+    
+    if (_chess?.isCheckmate()) {
+      const winner = _chess.turn() === "w" ? "b" : "w";
+      setWinner(winner)
+    }
   }, [board]);
 
   return (
     <div className="border-4 border-slate-800 inline-block">
+      {winner && (
+        <div className='m-4'>
+          {winner} player Won
+        </div>
+      )}
       {board.map((row, i) => (
         <div key={i} className='flex'>
           {row.map((square, j) => {
             const squareId = String.fromCharCode(97 + j) + String(8 - i);
+            const squareBgClass = selectedSquare === squareId
+              ? 'bg-blue-400'
+              : (i + j) % 2 === 0
+                ? 'bg-green-200'
+                : 'bg-slate-500';
             return (
               <div 
                 key={`${i}-${j}-${square?.type || 'empty'}`} // Force re-render with piece type
                 onClick={() => handleSquareClick(squareId)}
-                className={`
-                  w-16 h-16 flex items-center justify-center text-4xl
-                  ${(i + j) % 2 === 0 ? 'bg-green-200' : 'bg-slate-500'}
-                  ${selectedSquare === squareId ? 'bg-blue-400' : ''}
-                `}
+                className={`w-16 h-16 flex items-center justify-center text-4xl ${squareBgClass}`}
               >
                 {square && 
                   <FontAwesomeIcon 

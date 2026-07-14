@@ -49,12 +49,18 @@ export class Game {
       return;
     }
 
-    // 3. Make move
-    const playedMove = this.chess.move(move);
+    // 3. Make move (guard against chess.js throwing on invalid input)
+    let playedMove: any = null;
+    try {
+      playedMove = this.chess.move(move as any);
+    } catch (err) {
+      console.log("invalid move (exception)", move, err);
+      return null;
+    }
 
     if (!playedMove) {
       console.log("invalid move ", move);
-      return;
+      return null;
     }
 
     // 4. Update game status
