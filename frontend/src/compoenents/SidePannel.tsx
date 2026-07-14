@@ -1,11 +1,11 @@
 import React from 'react'
 import Button from './Button'
 
-const SidePannel = () => {
+const SidePannel = ({onGameStart}: any) => {
+  console.log("onGameStart", typeof onGameStart)
   return (
     <div>
-        <Button label='play' onClick={()=>{}}></Button>
-      
+        <Button label='play' onClick={() => { onGameStart() }}></Button>
     </div>
   )
 }

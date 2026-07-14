@@ -8,42 +8,42 @@ const uuid_1 = require("uuid");
 const app = (0, express_1.default)();
 const http_1 = __importDefault(require("http"));
 const gameManger_1 = require("./gameManger");
-const game_1 = require("./game");
+const Game_1 = require("./Game");
 const server = http_1.default.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
-        methods: ["GET", "POST"]
-    }
+        methods: ["GET", "POST"],
+    },
 });
 const gameManager = new gameManger_1.GameManager();
 app.get("/health", (res) => {
     console.log("fine");
     res.json({ message: "hello fine" });
 });
-io.on('connection', (socket) => {
-    console.log('a user connected');
+io.on("connection", (socket) => {
+    console.log("a user connected");
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
         var _a;
         console.log(p, "joing game recienved", p.id);
         const player = {
             id: p.id || (0, uuid_1.v4)(),
-            color: 'w',
-            socket: socket
+            color: "w",
+            socket: socket,
         };
         const result = gameManager.joinGame(player);
-        console.log(result.game.status == game_1.GameStatus.waiting, ' waiting check');
-        if (result.game.status == game_1.GameStatus.waiting) {
-            console.log('emiteing the player 1');
+        console.log(result.game.status == Game_1.GameStatus.waiting, " waiting check");
+        if (result.game.status == Game_1.GameStatus.waiting) {
+            console.log("emiteing the player 1");
             (_a = result.game.player1) === null || _a === void 0 ? void 0 : _a.socket.emit("waiting", {
-                gameId: result.game.id
+                gameId: result.game.id,
             });
             socket.join(result.game.id);
             return;
         }
-        if (result.game.status == game_1.GameStatus.inGame) {
+        if (result.game.status == Game_1.GameStatus.inGame) {
             socket.join(result.game.id);
             const player1 = result.game.player1;
             const player2 = result.game.player2;
@@ -51,21 +51,25 @@ io.on('connection', (socket) => {
                 gameId: result.game.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
-                color: 'w'
+                color: "w",
             });
             player2.socket.emit("game-start", {
                 gameId: result.game.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
-                color: 'b'
+                color: "b",
             });
             return;
         }
     });
     socket.on("move", (playload) => {
-        const data = JSON.parse(playload);
-        const game = gameManager.getGame(data.gameId);
-        console.log(game, 'returned game ');
+        let data = playload;
+        if (typeof data == "string") {
+            data = JSON.parse(playload);
+        }
+        console.log("payload move ", playload, playload.move);
+        const game = gameManager.getGame(playload.gameId);
+        console.log(game, "returned game ");
         if (!game) {
             socket.emit("gamenotfound", { receivedGameId: data.gameId });
             return;
@@ -82,13 +86,13 @@ io.on('connection', (socket) => {
         }
         console.log("emiteted ");
         const res = io.sockets.adapter.rooms.get(game.id);
-        console.log('res game paritcipants  ', res);
+        console.log("res game paritcipants  ", res);
         io.to(data.gameId).emit("move-made", {
             gameId: data.gameId,
             fen: game.chess.fen(),
             turn: game.chess.turn(),
             gameOver: game.chess.isGameOver(),
-            winner: winner
+            winner: winner,
         });
     });
 });

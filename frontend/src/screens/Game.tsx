@@ -1,4 +1,4 @@
-import { useState ,useEffect} from 'react'
+import { useState ,useEffect, useCallback} from 'react'
 import { socket } from '../socket'
 import { Chess } from "chess.js";
 import Chessboard from '../compoenents/chessboard';
@@ -9,8 +9,6 @@ const Game = () => {
   const [board,setBoard]=useState(new Chess().board())
 const [turn, setTurn] = useState("w")
 const [gameId, setGameId] = useState("")
-
-
 
 useEffect(() => {
   
@@ -52,7 +50,7 @@ function onMove(move:{from:string,to:string}){
   console.log("move emited ", move)
 
 }
-const JoinGame=()=>{
+function JoinGame(){
   console.log("joined game clikec " , socket)
   const id=crypto.randomUUID()
   socket.emit("join-game",{id})
@@ -70,16 +68,15 @@ const JoinGame=()=>{
         {/* Chess Board */}
         <div className="flex-1 flex justify-center items-center">
             <Chessboard
-                chess={chess}
-                board={board}
-                currentTurn={turn}
-                onMove={onMove}
-            />
+            chess={chess}
+            board={board}
+            currentTurn={turn}
+            onMove={onMove} socket={socket}  />
         </div>
 
         {/* Side Panel */}
         <div className="w-80 border-l border-border bg-card">
-            <SidePannel />
+            <SidePannel  onGameStart={JoinGame} />
         </div>
 
     </div>
