@@ -2,6 +2,7 @@ import { useState ,useEffect} from 'react'
 import { socket } from '../socket'
 import { Chess } from "chess.js";
 import Chessboard from '../compoenents/chessboard';
+import SidePannel from '../compoenents/SidePannel';
 const Game = () => {
   
   const [chess,setChess]=useState<any>(null)
@@ -57,22 +58,32 @@ const JoinGame=()=>{
   socket.emit("join-game",{id})
 }
   return (
-    <div className=' h-screen w-full  '>
-      <nav className='w-full text-center p-5'>
-      <h1 className='text-green-500 bg-text text-text '>Open Chess</h1>
-      </nav>
-      <div className='w-full h-full '>
-       
-          {/* chess board  */}
-          <Chessboard socket={socket} chess={chess} board={board} currentTurn={turn}   onMove={onMove }></Chessboard>
-        
-      
+    <div className="h-screen w-full bg-background">
+    <nav className="w-full text-center p-5">
+        <h1 className="text-3xl font-bold text-primary">
+            Open Chess
+        </h1>
+    </nav>
 
-      <button onClick={()=>{JoinGame()}}>play</button>
+    <div className="flex h-[calc(100vh-88px)]">
 
-      </div>
-      
+        {/* Chess Board */}
+        <div className="flex-1 flex justify-center items-center">
+            <Chessboard
+                chess={chess}
+                board={board}
+                currentTurn={turn}
+                onMove={onMove}
+            />
+        </div>
+
+        {/* Side Panel */}
+        <div className="w-80 border-l border-border bg-card">
+            <SidePannel />
+        </div>
+
     </div>
+</div>
   )
 }
 
