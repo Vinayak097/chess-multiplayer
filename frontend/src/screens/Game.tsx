@@ -9,6 +9,7 @@ const Game = () => {
   const [board,setBoard]=useState(new Chess().board())
 const [turn, setTurn] = useState("w")
 const [gameId, setGameId] = useState("")
+const [playerId,setPlayerId]=useState<string>("")
 
 useEffect(() => {
   
@@ -43,7 +44,9 @@ useEffect(() => {
 
 }, []);
 function onMove(move:{from:string,to:string}){
+  console.log("playeid sending " , playerId)
   socket.emit('move',{
+    playerId:playerId,
     gameId:gameId,
     move
   })
@@ -53,6 +56,7 @@ function onMove(move:{from:string,to:string}){
 function JoinGame(){
   console.log("joined game clikec " , socket)
   const id=crypto.randomUUID()
+  setPlayerId(id)
   socket.emit("join-game",{id})
 }
   return (

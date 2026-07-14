@@ -32,6 +32,10 @@ io.on("connection", (socket: Socket) => {
   console.log("a user connected");
   socket.emit("a user is connected");
   socket.on("join-game", (p: { id: string }) => {
+    let data = p;
+    if (typeof p == "string") {
+      data = JSON.parse(p);
+    }
     console.log(p, "joing game recienved", p.id);
     const player = {
       id: p.id || uuidv4(),
@@ -39,6 +43,9 @@ io.on("connection", (socket: Socket) => {
       socket: socket,
     };
     const result = gameManager.joinGame(player);
+    if (result == null) {
+      return;
+    }
 
     console.log(result.game.status == GameStatus.waiting, " waiting check");
     if (result.game.status == GameStatus.waiting) {
@@ -84,7 +91,7 @@ io.on("connection", (socket: Socket) => {
       socket.emit("gamenotfound", { receivedGameId: data.gameId });
       return;
     }
-    const move = game.makemove(data.move);
+    const move = game.makemove({ playerId: data.playerId, move: data.move });
 
     if (!move) {
       console.log("invalid move ");

@@ -30,8 +30,10 @@ class GameManager {
         var _a;
         const game = this.game.find((game) => game.status === Game_1.GameStatus.waiting);
         const isingame = this.isPlayerinGame(player.id);
-        if (isingame)
-            throw new Error("already in game");
+        if (isingame) {
+            console.log("already in game");
+            return null;
+        }
         if (!game) {
             const id = (0, uuid_1.v4)();
             const game = new Game_1.Game(id, player);

@@ -11,6 +11,10 @@ export type Player = {
   id: string;
   socket: Socket;
 };
+export type MovePayload = {
+  playerId: string | null;
+  move: Move;
+};
 
 export class Game {
   id: string;
@@ -26,29 +30,50 @@ export class Game {
       (this.player2 = null),
       (this.chess = new Chess()));
   }
-  makemove(move: Move) {
-    const turn = this.chess.turn();
-
-    const movve = this.chess.move(move);
-    if (!movve) {
-      throw new Error("not a valid move");
+  makemove({ playerId, move }: MovePayload) {
+    console.log("playerd from move ", playerId, move);
+    // 1. Game already ended
+    if (this.status === GameStatus.ended) {
+      console.log("Game has already ended");
+      return;
     }
+
+    // 2. Check whose turn it is
+    const turn = this.chess.turn(); // 'w' or 'b'
+
+    if (
+      (turn === "w" && playerId !== this.player1?.id) ||
+      (turn === "b" && playerId !== this.player2?.id)
+    ) {
+      console.log("not your turn ", playerId);
+      return;
+    }
+
+    // 3. Make move
+    const playedMove = this.chess.move(move);
+
+    if (!playedMove) {
+      console.log("invalid move ", move);
+      return;
+    }
+
+    // 4. Update game status
     if (this.chess.isGameOver()) {
-      //handle game over by sending emit
       this.status = GameStatus.ended;
     }
+
+    // 5. Return updated game state
     return {
-      move: movve,
+      move: playedMove,
       fen: this.chess.fen(),
       turn: this.chess.turn(),
       gameOver: this.chess.isGameOver(),
       checkmate: this.chess.isCheckmate(),
+      draw: this.chess.isDraw(),
+      stalemate: this.chess.isStalemate(),
+      insufficientMaterial: this.chess.isInsufficientMaterial(),
+      threefoldRepetition: this.chess.isThreefoldRepetition(),
     };
-    //validation
-    //check whos turn is this
-    //make changes to the board with that move
-    //check winnerr if so return winner somhow
-    //and return the chess
   }
   addPlayer(player: Player) {
     this.player2 = player;

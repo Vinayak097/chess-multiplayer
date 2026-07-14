@@ -36,7 +36,11 @@ export class GameManager {
   joinGame(player: Player) {
     const game = this.game.find((game) => game.status === GameStatus.waiting);
     const isingame = this.isPlayerinGame(player.id);
-    if (isingame) throw new Error("already in game");
+    if (isingame) {
+      console.log("already in game");
+      return null;
+    }
+
     if (!game) {
       const id = uuid4();
       const game = new Game(id, player);
