@@ -22,7 +22,7 @@ const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   return pieceMap[piece.color + piece.type];
 };
 
-const Chessboard = ({ chess, socket, board, onMove, currentTurn }: {
+const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn }: {
   chess: any,
   socket: Socket,
   board: ({

@@ -2,10 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme:dark ;
+@layer base {
+  :root {
+    --board-light: theme('colors.card');
+    --board-dark: theme('colors.card');
+
+    --background: theme('colors.background');
+    
+    --text: theme('colors.white');
+    --muted: theme('colors.white');
+
+    --border: theme('colors.border');
+    --card: theme('colors.card');
+
+    --primary: theme('colors.primary');
+    --primary-hover: theme('colors.primary');
+
+
+
+
+    color-scheme: dark;
+  }
 }
-body{
-  background-color: var(--background-color);
+
+body {
+  background-color: var(--background);
 }
 

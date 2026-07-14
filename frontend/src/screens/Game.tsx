@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState ,useEffect} from 'react'
 import { socket } from '../socket'
 import { Chess } from "chess.js";
@@ -8,7 +7,6 @@ const Game = () => {
   const [chess,setChess]=useState<any>(null)
   const [board,setBoard]=useState(new Chess().board())
 const [turn, setTurn] = useState("w")
-const [color, setColor] = useState()
 const [gameId, setGameId] = useState("")
 
 
@@ -23,12 +21,12 @@ useEffect(() => {
     });
 
     socket.on("game-start", (data) => {
-      
       setGameId(data.gameId)
       setTurn(data.color)
-      setChess(new Chess(data.fen)) 
-      setBoard(chess.board());
-      console.log("data" , data)
+      const newChess = new Chess(data.fen);
+      setChess(newChess);
+      setBoard(newChess.board());
+      console.log("data", data)
     });
 
     socket.on("move-made", (data) => {
@@ -61,7 +59,7 @@ const JoinGame=()=>{
   return (
     <div className=' h-screen w-full  '>
       <nav className='w-full text-center p-5'>
-      <h1 className='text-green-500 bg-background'>Open Chess</h1>
+      <h1 className='text-green-500 bg-text text-text '>Open Chess</h1>
       </nav>
       <div className='w-full h-full '>
        
