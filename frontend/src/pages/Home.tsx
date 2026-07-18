@@ -2,6 +2,7 @@ import React from 'react'
 import PlayCards from '../component/PlayCards'
 import { faZap, faClock, faBolt } from '@fortawesome/free-solid-svg-icons';
 import EnterArenaCard from '@/component/EnterArenaCard';
+import { MoveLeft } from 'lucide-react';
 const gameModes = [
   {
     icon: faZap,
@@ -31,6 +32,7 @@ interface GameType{
 const Home = () => {
   return (
     <div className='border  h-screen flex  flex-col items-center justify-center p-'>
+      
         <div className='w-xl'>
           <EnterArenaCard></EnterArenaCard>
         </div>

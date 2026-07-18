@@ -60,7 +60,8 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   }, [board]);
 
   return (
-    <div className="border-4 border-slate-800 inline-block">
+    <div className=''>
+    <div className="border-4 border-black  inline-block ">
       {winner && (
         <div className='m-4'>
           {winner} player Won
@@ -73,8 +74,8 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
             const squareBgClass = selectedSquare === squareId
               ? 'bg-blue-400'
               : (i + j) % 2 === 0
-                ? 'bg-green-200'
-                : 'bg-slate-500';
+                ? 'bg-zinc-700'
+                : 'bg-black-500';
             return (
               <div 
                 key={`${i}-${j}-${square?.type || 'empty'}`} // Force re-render with piece type
@@ -84,7 +85,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
                 {square && 
                   <FontAwesomeIcon 
                     icon={getPieceIcon(square)} 
-                    className={`${square.color === 'w' ? 'text-white' : 'text-black'}`}
+                    className={`${square.color === 'w' ? 'text-orange-600' : 'text-white'}`}
                   />
                 }
               </div>
@@ -92,6 +93,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
           })}
         </div>
       ))}
+    </div>
     </div>
   );
 };
