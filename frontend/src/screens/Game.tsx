@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { socket } from '../socket'
 import { Chess } from 'chess.js';
-import Chessboard from '../component/chessboard';
-import SidePannel from '../component/SidePannel';
+
+import { UserRoundArrowLeft } from 'lucide-react';
+import UserPlayCard from '@/component/UserPlayCard';
+
+
 
 const Game = () => {
   const [chess, setChess] = useState<any>(null)
@@ -13,8 +16,6 @@ const Game = () => {
 
 
 useEffect(() => {
-  
-
     socket.on("waiting", (data) => {
       setGameId(data.gameId)
         console.log(data,);
@@ -42,8 +43,8 @@ useEffect(() => {
         socket.off("game-start");
         socket.off("move-made");
     };
-
 }, []);
+
 function onMove(move:{from:string,to:string}){
   socket.emit('move', {
     gameId,
@@ -52,31 +53,11 @@ function onMove(move:{from:string,to:string}){
   console.log('move emited ', move)
 }
   return (
-    <div className="h-screen w-full bg-background">
-    <nav className="w-full text-center p-5">
-        <h1 className="text-3xl font-bold text-primary">
-            Open Chess
-        </h1>
-    </nav>
 
-    <div className="flex h-[calc(100vh-88px)]">
-
-        {/* Chess Board */}
-        <div className="flex-1 flex justify-center items-center">
-            <Chessboard
-            chess={chess}
-            board={board}
-            currentTurn={turn}
-            onMove={onMove} socket={socket}            />
-        </div>
-
-        {/* Side Panel */}
-        <div className="w-80 border-l border-border bg-card">
-            <SidePannel />
-        </div>
-
-    </div>
-</div>
+ <div>
+  <UserPlayCard></UserPlayCard>
+ </div>   
+    
   )
 }
 

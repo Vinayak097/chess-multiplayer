@@ -20,7 +20,7 @@ interface PlaycardProp{
 
 const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => {
   return (
-    <Card className="border bg-black w-48 h-48">
+    <Card className="border bg-black w-54 h-48">
       <CardHeader>
         <CardTitle>
           <FontAwesomeIcon
@@ -40,7 +40,6 @@ const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => 
         <span className="p-1 bg-orange-500 border mr-1"></span>
         {players}
       </CardFooter>
-
     </Card>
   )
 }

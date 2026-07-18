@@ -25,11 +25,18 @@ const gameModes = [
     players: "8,451",
   },
 ];
+interface GameType{
+   
+}
 const Home = () => {
   return (
-    <div className='border  h-screen'>
-      <PlayCards {...gameModes[0]} />
-      <EnterArenaCard></EnterArenaCard>
+    <div className='border  h-screen flex  flex-col items-center justify-center p-'>
+        <div className='w-xl'>
+          <EnterArenaCard></EnterArenaCard>
+        </div>
+      <div className='grid grid-cols-2 gap-2 pt-2 w-xl'>
+        {gameModes.map(gamemode=><PlayCards {...gamemode}></PlayCards>)}
+      </div>
     </div>
   )
 }
