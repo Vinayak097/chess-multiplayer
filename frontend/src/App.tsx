@@ -1,8 +1,9 @@
 
 import './App.css'
 import { Routes,Route} from 'react-router-dom'
-import {Landing} from './screens/Landing'
+
 import Game from './screens/Game'
+import Home from './pages/Home'
 function App() {
   return (
     <>
@@ -10,7 +11,8 @@ function App() {
 
    
      <Routes>
-      <Route path='/' element={<Landing></Landing>}></Route>
+      
+      <Route path='/' element={<Home></Home>}></Route>
       <Route path='/game' element={<Game></Game>} ></Route>
      </Routes>
      

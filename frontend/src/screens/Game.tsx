@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { socket } from '../socket'
 import { Chess } from 'chess.js';
-import Chessboard from '../compoenents/chessboard';
-import SidePannel from '../compoenents/SidePannel';
+import Chessboard from '../component/chessboard';
+import SidePannel from '../component/SidePannel';
 
 const Game = () => {
   const [chess, setChess] = useState<any>(null)
