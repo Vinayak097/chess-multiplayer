@@ -1,16 +1,16 @@
-import { useState ,useEffect, useCallback} from 'react'
+import { useState, useEffect } from 'react'
 import { socket } from '../socket'
-import { Chess } from "chess.js";
+import { Chess } from 'chess.js';
 import Chessboard from '../compoenents/chessboard';
 import SidePannel from '../compoenents/SidePannel';
+
 const Game = () => {
-  
-  const [chess,setChess]=useState<any>(null)
-  const [board,setBoard]=useState(new Chess().board())
-const [turn, setTurn] = useState("w")
-const [gameId, setGameId] = useState("")
-const [playerId,setPlayerId]=useState<string>("")
-const [winner,setWinner]=useState<null|string>(null)
+  const [chess, setChess] = useState<any>(null)
+  const [board, setBoard] = useState(new Chess().board())
+  const [turn, setTurn] = useState('w')
+  const [gameId, setGameId] = useState('')
+
+
 
 useEffect(() => {
   
@@ -31,14 +31,10 @@ useEffect(() => {
     });
 
     socket.on("move-made", (data) => {
-
         const chess = new Chess(data.fen);
         setChess(chess);
     setBoard(chess.board());
     setTurn(data.turn);
-    if(data.gameOver){
-      setWinner(data.winner)
-    }
     });
 
     return () => {
@@ -48,23 +44,12 @@ useEffect(() => {
     };
 
 }, []);
-
-
 function onMove(move:{from:string,to:string}){
-  console.log("playeid sending " , playerId)
-  socket.emit('move',{
-    playerId:playerId,
-    gameId:gameId,
-    move
+  socket.emit('move', {
+    gameId,
+    move,
   })
-  console.log("move emited ", move)
-
-}
-function JoinGame(){
-  console.log("joined game clikec " , socket)
-  const id=crypto.randomUUID()
-  setPlayerId(id)
-  socket.emit("join-game",{id})
+  console.log('move emited ', move)
 }
   return (
     <div className="h-screen w-full bg-background">
@@ -74,22 +59,20 @@ function JoinGame(){
         </h1>
     </nav>
 
-
     <div className="flex h-[calc(100vh-88px)]">
 
         {/* Chess Board */}
         <div className="flex-1 flex justify-center items-center">
-          
             <Chessboard
             chess={chess}
             board={board}
             currentTurn={turn}
-            onMove={onMove} socket={socket}  />
+            onMove={onMove} socket={socket}            />
         </div>
 
         {/* Side Panel */}
         <div className="w-80 border-l border-border bg-card">
-            <SidePannel  onGameStart={JoinGame}  />
+            <SidePannel />
         </div>
 
     </div>

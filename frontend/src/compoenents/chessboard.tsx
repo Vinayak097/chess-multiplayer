@@ -34,14 +34,11 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   currentTurn: string
 }) => {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
-  const[winner,setWinner]=useState<null|string>()
-  const [fmoves,setFmoves]=useState<any[]>([])
+  const [winner, setWinner] = useState<null | string>();
   const handleSquareClick = (square: string) => {
-    console.log("selectedsquare" , selectedSquare ,square)
+    console.log('selectedsquare', selectedSquare, square)
     if (!selectedSquare) {
       setSelectedSquare(square);
-      setFmoves(_chess.move({square:selectedSquare,verbose:true}))
-
     } else {
 
       onMove({
