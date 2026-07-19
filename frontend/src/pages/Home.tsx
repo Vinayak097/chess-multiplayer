@@ -48,12 +48,16 @@ const Home = () => {
   return (
     <div className='border  h-screen flex  flex-col items-center justify-center p-'>
       
-        <div className='w-xl'>
+        <div className='w-md'>
           <EnterArenaCard quickPlay={quickPlay}></EnterArenaCard>
         </div>
-      <div className='grid grid-cols-2 gap-2 pt-2 w-xl'>
+        <div className='w-md '>
+          <div className='grid grid-cols-[auto_auto] gap-2 justify-between pt-2 w-full'>
         {gameModes.map(gamemode=><PlayCards {...gamemode}></PlayCards>)}
       </div>
+
+        </div>
+      
     </div>
   )
 }

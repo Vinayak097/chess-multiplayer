@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
                 turn: result.game.chess.turn(),
                 color: "w",
             });
-            console.log(result.game, ' game object ');
+            console.log(result.game, ' game object');
             player2.socket.emit("game-start", {
                 gameId: result.game.id,
                 playerId: (_c = result.game.player2) === null || _c === void 0 ? void 0 : _c.id,

@@ -108,7 +108,7 @@ const Game = () => {
         {/* back button bar */}
         <div className={`flex justify-between  w-lg `}>
           <div>
-            <Button className="bg-black text-white flex gap-2 rounded-none">
+            <Button disabled={!play} className="bg-black text-white flex gap-2 rounded-none">
               <MoveLeft></MoveLeft>
               <span>EXTRACT</span>
             </Button>

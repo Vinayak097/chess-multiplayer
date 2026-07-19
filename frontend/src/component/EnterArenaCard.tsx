@@ -12,7 +12,7 @@ import { Button } from "@/component/ui/button";
 const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
   
   return (
-    <Card className="bg-[#111214]  border-b border-zinc-800 rounded-sm p-2 px-5 pb-5   w-lg ">
+    <Card className="bg-[#111214] text-max-xl  rounded-none border-b border-zinc-800  p-2 px-5 pb-5 md:w-ful w-full">
       <CardHeader className="border-b flex justify-between p-0  h-[10px] rounded-0">
         <h1 className="text-orange-500 w-fit"> // Briefing_01</h1>
         <div className="text-gray-500">
@@ -23,14 +23,14 @@ const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
       </CardHeader>
 
       <CardContent>
-        <CardTitle className="text-green-400">
+        <CardTitle className="text-cyan-400 tracking-wider font-semibold text-xs">
           MATCHMAKING ONLINE
         </CardTitle>
-        <CardTitle className="text-3xl text-orange-500">
+        <CardTitle className="text-lg text-orange-500 ">
           <span className="text-white">ENTER THE</span> <br></br>
           <span className="text-orange-500"> ARENA_</span>
         </CardTitle>
-        <CardDescription className=" mt-2 flex flex-col">
+        <CardDescription className=" mt-2 flex flex-col text-xs">
         <span> {">"} Mached by rating in </span>
         <span>under 8 seconds</span>
         <span> First move is yours</span>
@@ -38,7 +38,7 @@ const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
       </CardContent>
       
       <CardFooter>
-        <Button onClick={()=>quickPlay("rapid")} className="text-black font-bold tracking-wider bg-orange-500 rounded-none clip-tactical rounded-bl-3xl rounded-tr-3xl p-10">
+        <Button onClick={()=>quickPlay("r apid")} className="text-black font-bold tracking-wider text-xs bg-orange-500 rounded-none clip-tactical rounded-bl-sm rounded-tr-sm p-2">
           QUICK MATCH
         </Button>
       </CardFooter>
