@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChessKing, faChessQueen, faChessRook, faChessBishop, faChessKnight, faChessPawn } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'socket.io-client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   const pieceMap: { [key: string]: any } = {
@@ -58,7 +59,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
       setWinner(winner)
     }
   }, [board]);
-
+  const ismobile=useIsMobile()
   return (
     <div className=''>
     <div className="border-4 border-black  inline-block ">
@@ -68,7 +69,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
         </div>
       )}
       {board.map((row, i) => (
-        <div key={i} className='flex'>
+        <div key={i} className='flex w-full '>
           {row.map((square, j) => {
             const squareId = String.fromCharCode(97 + j) + String(8 - i);
             const squareBgClass = selectedSquare === squareId
@@ -80,10 +81,12 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
               <div 
                 key={`${i}-${j}-${square?.type || 'empty'}`} // Force re-render with piece type
                 onClick={() => handleSquareClick(squareId)}
-                className={`w-16 h-16 flex items-center justify-center text-4xl ${squareBgClass}`}
+                className={`w-10 h-10 lg:h-12 lg:w-12 flex items-center justify-center text-4xl ${squareBgClass}`}
               >
                 {square && 
                   <FontAwesomeIcon 
+                  height={ismobile?8:50}
+                  width={ismobile?20:50}
                     icon={getPieceIcon(square)} 
                     className={`${square.color === 'w' ? 'text-orange-600' : 'text-white'}`}
                   />

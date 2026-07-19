@@ -35,7 +35,7 @@ const Game = () => {
   const [board, setBoard] = useState(new Chess().board());
   const [turn, setTurn] = useState("w");
   const [gameId, setGameId] = useState("");
-  const [gamestate, setGameState] = useState("waiting");
+  const [gamestate, setGameState] = useState("");
   const navigate = useNavigate()
   const [playerId,setPlayerId]=useState("")
   const [color , setColor]=useState<"w"|"b">()
@@ -103,20 +103,20 @@ const Game = () => {
   
 
   return (
-    <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 ">
-      <div className={`w-lg flex flex-col gap-2  ${gamestate=='waiting' && 'opacity-20'} `}>
+    <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 m-4">
+      <div className={`w-full sm:max-w-sm    flex items-center flex-col gap-2  ${gamestate=='waiting' && 'opacity-20'} `}>
         {/* back button bar */}
-        <div className={`flex justify-between  w-lg `}>
+        <div className={`flex justify-between  w-full lg:max-w-sm  `}>
           <div>
             <Button disabled={!play} className="bg-black text-white flex gap-2 rounded-none">
-              <MoveLeft></MoveLeft>
-              <span>EXTRACT</span>
+              <MoveLeft />
+              <span className="text-xs sm:text-base">EXTRACT </span>
             </Button>
           </div>
           <div className="relative flex items-center gap-2 border border-orange-600 px-2 py-1">
             <div className="absolute inset-0 bg-orange-800 opacity-20"></div>
             <span className="relative h-2 w-2  rounded-full bg-orange-500"></span>
-            <span className="relative text-orange-500">LIVE</span>
+            <span className="relative text-orange-500 lg:text-lg  text-xs">LIVE</span>
           </div>
         </div>
 
@@ -135,12 +135,12 @@ const Game = () => {
         <UserPlayCard></UserPlayCard>
 
         {/* FOOTER CARDS */}
-        <div className=" flex gap-2">
+        <div className=" flex justify-between  gap-2  w-full lg:max-w-sm">
           {footers.map((foot: { icon: ReactNode; text: string }) => (
-            <div className="bg-black p-4 w-sm border items-center justify-center">
+            <div className="bg-black p-4 w-full lg:w-full  border items-center justify-center">
               <div className=" flex items-center flex-col">
-                <span>{foot.icon}</span>
-                <span>{foot.text}</span>
+                <span className="text-[10px] sm:text-sm">{foot.icon}</span>
+                <span className="text-[10px] sm:text-sm">{foot.text}</span>
               </div>
             </div>
           ))}
