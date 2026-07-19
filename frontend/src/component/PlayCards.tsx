@@ -24,7 +24,7 @@ const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => 
   const navigate=useNavigate()
   return (
     <Card  onClick={()=>{socket.emit('join-game',{id:crypto.randomUUID(),type:title}) 
-    navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all rounded-none bg-black w-55 h-40 ">
+    navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all rounded-none bg-black lg:w-55 h-40 ">
       <CardHeader>
         <CardTitle>
           <FontAwesomeIcon
