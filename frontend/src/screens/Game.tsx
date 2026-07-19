@@ -44,11 +44,13 @@ const Game = () => {
     });
 
     socket.on("game-start", (data) => {
+      
       setGameId(data.gameId);
       setTurn(data.color);
       const newChess = new Chess(data.fen);
       setChess(newChess);
       setBoard(newChess.board());
+      setGameState("")
       console.log("data", data);
     });
 
@@ -77,6 +79,7 @@ const Game = () => {
     console.log("game canclesed ");
     navigate('/')
   }
+
   return (
     <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 ">
       <div className={`w-lg flex flex-col gap-2  ${gamestate=='waiting' && 'opacity-20'} `}>

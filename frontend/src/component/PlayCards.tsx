@@ -23,7 +23,7 @@ interface PlaycardProp{
 const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => {
   const navigate=useNavigate()
   return (
-    <Card  onClick={()=>{socket.emit('join-game',{id:"djfles",type:title}) 
+    <Card  onClick={()=>{socket.emit('join-game',{id:crypto.randomUUID(),type:title}) 
     navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all bg-black w-54 h-48">
       <CardHeader>
         <CardTitle>

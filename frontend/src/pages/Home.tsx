@@ -37,7 +37,8 @@ const Home = () => {
   const navigate=useNavigate()
   function quickPlay(gametype:string){
     socket.emit('join-game',{
-      id:"hdlsfjd",
+      id: crypto.randomUUID(),
+
       type:gametype
     })
     navigate('/game?s=waiting')
