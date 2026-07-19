@@ -18,7 +18,7 @@ class Game {
     }
     makemove({ playerId, move }) {
         var _a, _b;
-        console.log("playerd from move ", playerId, move);
+        console.log("playerd from move", playerId, move);
         // 1. Game already ended
         if (this.status === GameStatus.ended) {
             console.log("Game has already ended");

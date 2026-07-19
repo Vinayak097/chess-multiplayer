@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     console.log("a user connected");
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
-        var _a;
+        var _a, _b, _c;
         let data = p;
         if (typeof p == "string") {
             data = JSON.parse(p);
@@ -56,12 +56,15 @@ io.on("connection", (socket) => {
             const player2 = result.game.player2;
             player1.socket.emit("game-start", {
                 gameId: result.game.id,
+                playerId: (_b = result.game.player1) === null || _b === void 0 ? void 0 : _b.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "w",
             });
+            console.log(result.game, ' game object ');
             player2.socket.emit("game-start", {
                 gameId: result.game.id,
+                playerId: (_c = result.game.player2) === null || _c === void 0 ? void 0 : _c.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "b",

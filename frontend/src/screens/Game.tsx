@@ -9,6 +9,7 @@ import Chessboard from "@/component/chessboard";
 import { Undo2, Lightbulb, Handshake, Flag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
+
 <Flag />;
 const footers = [
   {
@@ -36,21 +37,28 @@ const Game = () => {
   const [gameId, setGameId] = useState("");
   const [gamestate, setGameState] = useState("waiting");
   const navigate = useNavigate()
-
+  const [playerId,setPlayerId]=useState("")
+  const [color , setColor]=useState<"w"|"b">()
+  const [winner,setWinner] = useState<string>("")
+  const [play,setPlay]=useState(true)
   useEffect(() => {
     socket.on("waiting", (data) => {
       setGameId(data.gameId);
+      setPlay(false)
       console.log(data);
     });
 
     socket.on("game-start", (data) => {
-      
       setGameId(data.gameId);
       setTurn(data.color);
+      setPlay(false)
+      setPlayerId(data.playerId);
+      console.log('settled the playerid', data.playerId);
       const newChess = new Chess(data.fen);
       setChess(newChess);
       setBoard(newChess.board());
       setGameState("")
+      setColor(data.color)
       console.log("data", data);
     });
 
@@ -58,7 +66,18 @@ const Game = () => {
       const chess = new Chess(data.fen);
       setChess(chess);
       setBoard(chess.board());
+      
       setTurn(data.turn);
+      if(data.winner){
+        setWinner(winner)
+        setGameState("finished")
+        setTimeout(()=>{
+          setWinner('')
+          setGameState('')
+          setPlay(true)
+        },3000)
+        
+      }
     });
 
     return () => {
@@ -71,14 +90,17 @@ const Game = () => {
   function onMove(move: { from: string; to: string }) {
     socket.emit("move", {
       gameId,
+      playerId,
       move,
     });
-    console.log("move emited ", move);
+
+    console.log("move emited ", move , playerId);
   }
   function cancelMatchmaking(){
     console.log("game canclesed ");
     navigate('/')
   }
+  
 
   return (
     <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 ">
@@ -147,8 +169,16 @@ const Game = () => {
       </div>
     </div>
   )}
+  {gamestate=="finished" && (
+    <div className="absolute inset-0 flex items-center justify-center bg-transperant border border-orange-600 ">
+        <div>
+          <h1 className="font-extrabold text-3xl p-2 bg-black ">You {winner==color?(<span className="text-orange-700">Won</span>):(<span className="text-orange-700">Lose</span>)}</h1>
+        </div>
+    </div>
+  )}
     </div>
   );
+
 };
 
 export default Game;

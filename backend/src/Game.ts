@@ -31,7 +31,7 @@ export class Game {
       (this.chess = new Chess()));
   }
   makemove({ playerId, move }: MovePayload) {
-    console.log("playerd from move ", playerId, move);
+    console.log("playerd from move", playerId, move);
     // 1. Game already ended
     if (this.status === GameStatus.ended) {
       console.log("Game has already ended");

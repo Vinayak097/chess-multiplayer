@@ -35,13 +35,14 @@ interface GameType{
 }
 const Home = () => {
   const navigate=useNavigate()
+  const playerId=crypto.randomUUID()
   function quickPlay(gametype:string){
     socket.emit('join-game',{
-      id: crypto.randomUUID(),
-
+      id: playerId,
+      
       type:gametype
     })
-    navigate('/game?s=waiting')
+    navigate(`/game?s=waiting&&playerId=${playerId}`)
   }
 
   return (

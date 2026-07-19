@@ -63,13 +63,17 @@ io.on("connection", (socket: Socket) => {
 
       player1.socket.emit("game-start", {
         gameId: result.game.id,
+        playerId:result.game.player1?.id,
         fen: result.game.chess.fen(),
         turn: result.game.chess.turn(),
         color: "w",
       });
+      
+      console.log(result.game , ' game object')
 
       player2.socket.emit("game-start", {
         gameId: result.game.id,
+        playerId: result.game.player2?.id,
         fen: result.game.chess.fen(),
         turn: result.game.chess.turn(),
         color: "b",
