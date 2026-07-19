@@ -9,7 +9,8 @@ import {
 } from "@/component/ui/card"
 import { Button } from "@/component/ui/button";
 
-const EnterArenaCard = () => {
+const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
+  
   return (
     <Card className="bg-[#111214]  border-b border-zinc-800 rounded-sm p-2 px-5 pb-5   w-lg ">
       <CardHeader className="border-b flex justify-between p-0  h-[10px] rounded-0">
@@ -37,7 +38,7 @@ const EnterArenaCard = () => {
       </CardContent>
       
       <CardFooter>
-        <Button className="text-black font-bold tracking-wider bg-orange-500 rounded-none clip-tactical rounded-bl-3xl rounded-tr-3xl p-10">
+        <Button onClick={()=>quickPlay("rapid")} className="text-black font-bold tracking-wider bg-orange-500 rounded-none clip-tactical rounded-bl-3xl rounded-tr-3xl p-10">
           QUICK MATCH
         </Button>
       </CardFooter>

@@ -7,8 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/component/ui/card"
+import { socket } from "@/socket";
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useNavigate } from "react-router-dom";
 
 interface PlaycardProp{
   icon: IconProp;
@@ -19,8 +21,10 @@ interface PlaycardProp{
 }
 
 const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => {
+  const navigate=useNavigate()
   return (
-    <Card className="border bg-black w-54 h-48">
+    <Card  onClick={()=>{socket.emit('join-game',{id:"djfles",type:title}) 
+    navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all bg-black w-54 h-48">
       <CardHeader>
         <CardTitle>
           <FontAwesomeIcon

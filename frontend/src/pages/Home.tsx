@@ -3,6 +3,10 @@ import PlayCards from '../component/PlayCards'
 import { faZap, faClock, faBolt } from '@fortawesome/free-solid-svg-icons';
 import EnterArenaCard from '@/component/EnterArenaCard';
 import { MoveLeft } from 'lucide-react';
+import { Socket } from 'socket.io-client';
+import { socket } from '@/socket';
+import { useNavigate } from 'react-router-dom';
+
 const gameModes = [
   {
     icon: faZap,
@@ -30,11 +34,20 @@ interface GameType{
    
 }
 const Home = () => {
+  const navigate=useNavigate()
+  function quickPlay(gametype:string){
+    socket.emit('join-game',{
+      id:"hdlsfjd",
+      type:gametype
+    })
+    navigate('/game?s=waiting')
+  }
+
   return (
     <div className='border  h-screen flex  flex-col items-center justify-center p-'>
       
         <div className='w-xl'>
-          <EnterArenaCard></EnterArenaCard>
+          <EnterArenaCard quickPlay={quickPlay}></EnterArenaCard>
         </div>
       <div className='grid grid-cols-2 gap-2 pt-2 w-xl'>
         {gameModes.map(gamemode=><PlayCards {...gamemode}></PlayCards>)}
