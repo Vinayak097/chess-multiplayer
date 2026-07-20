@@ -41,6 +41,11 @@ const Game = () => {
   const [color , setColor]=useState<"w"|"b">()
   const [winner,setWinner] = useState<string>("")
   const [play,setPlay]=useState(true)
+  const [result,setResult]=useState("")
+  const [blackTimer,setBlackTimer]=useState<number>(0)
+  const [whiteTimer,setWhiteTimer]=useState<number>(0)
+  console.log(color," color i got")
+
   useEffect(() => {
     socket.on("waiting", (data) => {
       setGameId(data.gameId);
@@ -79,6 +84,24 @@ const Game = () => {
         
       }
     });
+    
+    socket.on('game-over',(data=>{
+        setWinner(data.winner)
+        setResult(data.result)
+        
+        setGameState("finished")
+        setTimeout(()=>{
+          setWinner('')
+          setGameState('')
+          setPlay(true)
+        },3000)
+    }))
+    socket.on('timer-update',(data)=>{
+     
+    
+      setWhiteTimer(data.whiteTime)
+      setBlackTimer(data.blackTime)
+    })
 
     return () => {
       socket.off("waiting");
@@ -96,11 +119,12 @@ const Game = () => {
 
     console.log("move emited ", move , playerId);
   }
+
   function cancelMatchmaking(){
     console.log("game canclesed ");
     navigate('/')
   }
-  
+  console.log("game timing "  , whiteTimer,blackTimer)
 
   return (
     <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 m-4">
@@ -110,7 +134,7 @@ const Game = () => {
           <div>
             <Button disabled={!play} className="bg-black text-white flex gap-2 rounded-none">
               <MoveLeft />
-              <span className="text-xs sm:text-base">EXTRACT </span>
+              <span className="text-xs sm:text-base">EXTRACT</span>
             </Button>
           </div>
           <div className="relative flex items-center gap-2 border border-orange-600 px-2 py-1">
@@ -120,7 +144,7 @@ const Game = () => {
           </div>
         </div>
 
-        <UserPlayCard></UserPlayCard>
+        <UserPlayCard timer={blackTimer}></UserPlayCard>
 
         {/* chessboard */}
         <Chessboard
@@ -130,9 +154,10 @@ const Game = () => {
           onMove={onMove}
           socket={socket}
           key={3}
+          
         ></Chessboard>
 
-        <UserPlayCard></UserPlayCard>
+        <UserPlayCard timer={whiteTimer}></UserPlayCard>
 
         {/* FOOTER CARDS */}
         <div className=" flex justify-between  gap-2  w-full lg:max-w-sm">

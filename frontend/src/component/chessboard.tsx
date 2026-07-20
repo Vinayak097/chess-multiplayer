@@ -23,7 +23,7 @@ const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   return pieceMap[piece.color + piece.type];
 };
 
-const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn }: {
+const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn, }: {
   chess: any,
   socket: Socket,
   board: ({
@@ -32,7 +32,8 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
     color: Color
   } | null)[][],
   onMove: (move: { from: string, to: string }) => void,
-  currentTurn: string
+  currentTurn: string,
+  
 }) => {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [winner, setWinner] = useState<null | string>();

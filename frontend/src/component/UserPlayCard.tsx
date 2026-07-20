@@ -3,8 +3,15 @@ import { UserRoundArrowLeft } from 'lucide-react'
 import React from 'react'
 
 
-const UserPlayCard = () => {
-    const ismobile=useIsMobile()
+const formatTimer = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  const paddedSeconds = remainingSeconds.toString().padStart(2, '0')
+  return `${minutes}:${paddedSeconds}`
+}
+
+const UserPlayCard = ({ timer }: { timer: number }) => {
+    const ismobile = useIsMobile()
   return (
     <div  className='border w-full lg:max-w-sm bg-black flex justify-between p-1 px-2 items-center h-12 lg:max-h-18 border-orange-500'>
         <div className='flex gap-3 items-center '>
@@ -17,7 +24,7 @@ const UserPlayCard = () => {
             </div>
         </div>
         <div>
-            <span className='text-green-400 text-sm lg:text-md'>04:42</span>
+            <span className='text-green-400 text-sm lg:text-md'>{formatTimer(timer)}</span>
         </div>
     </div>
   )

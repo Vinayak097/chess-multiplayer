@@ -1,5 +1,7 @@
 import { Chess, Move } from "chess.js";
 import { Socket } from "socket.io";
+import { Timer } from "./Timer";
+import { io } from ".";
 
 export enum GameStatus {
   waiting = "waiting",
@@ -22,14 +24,20 @@ export class Game {
   player1: Player | null;
   player2: Player | null;
   chess: Chess;
-
+  winner:string|undefined;
+  result:string|undefined;
+  timer:Timer;
   constructor(id: string, player1: Player) {
     this.id = id;
     this.status = GameStatus.waiting;
-    ((this.player1 = player1),
-      (this.player2 = null),
-      (this.chess = new Chess()));
+    this.result=undefined;
+    this.player1 = player1,
+    this.player2 = null,
+    this.chess = new Chess();
+    this.timer=new Timer(id , 600, 600,'w',(gameId:string,loser:string)=>this.ontimeOut(loser),(whiteTimer:number , blackTimer:number)=>this.gameTick(whiteTimer,blackTimer))
+      
   }
+
   makemove({ playerId, move }: MovePayload) {
     console.log("playerd from move", playerId, move);
     // 1. Game already ended
@@ -62,7 +70,7 @@ export class Game {
       console.log("invalid move ", move);
       return null;
     }
-
+    this.timer.switchTurn(this.chess.turn())
     // 4. Update game status
     if (this.chess.isGameOver()) {
       this.status = GameStatus.ended;
@@ -81,8 +89,32 @@ export class Game {
       threefoldRepetition: this.chess.isThreefoldRepetition(),
     };
   }
+
   addPlayer(player: Player) {
     this.player2 = player;
     this.status = GameStatus.inGame;
+    this.timer.start()
+  }
+
+
+   ontimeOut(loser:string){
+    
+      this.status='finished'
+      this.winner=loser=='w'?'b':'w'
+      this.result='Timeout'
+
+      io.to(this.id).emit("game-over", {
+    winner: this.winner,
+    result: this.result
+});
+  }
+  gameTick(whiteTimer:number , blackTimer:number){
+    
+   
+    io.to(this.id).emit("timer-update",{
+      whiteTime:whiteTimer,
+      blackTime:blackTimer
+    })
+    
   }
 }

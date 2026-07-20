@@ -1,5 +1,7 @@
 import { Game, GameStatus, Player } from "./Game";
 import { v4 as uuid4 } from "uuid";
+import {Timer} from './Timer'
+import { io } from ".";
 type Move = {
   from: string;
   to: string;
@@ -7,6 +9,7 @@ type Move = {
 
 export class GameManager {
   game: Game[];
+  
 
   constructor() {
     this.game = [];
@@ -54,9 +57,14 @@ export class GameManager {
       }
       player.color = "b";
       game.addPlayer(player);
+
+     
+      
     }
     return {
       game,
     };
   }
+
+ 
 }

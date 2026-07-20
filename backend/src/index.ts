@@ -7,6 +7,7 @@ import { GameManager } from "./gameManger";
 import { GameStatus } from "./Game";
 import { Socket } from "socket.io";
 import { Move } from "chess.js";
+import { Timer } from "./Timer";
 
 type MovePayload = {
   playerId: string;
@@ -15,7 +16,7 @@ type MovePayload = {
 };
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
@@ -57,10 +58,11 @@ io.on("connection", (socket: Socket) => {
       return;
     }
     if (result.game.status == GameStatus.inGame) {
+      
       socket.join(result.game.id);
       const player1 = result.game.player1!;
       const player2 = result.game.player2!;
-
+      
       player1.socket.emit("game-start", {
         gameId: result.game.id,
         playerId:result.game.player1?.id,
@@ -101,6 +103,7 @@ io.on("connection", (socket: Socket) => {
       console.log("invalid move ");
       return;
     }
+
     console.log("move completed");
     let winner;
     if (game.chess.isCheckmate()) {
@@ -117,6 +120,8 @@ io.on("connection", (socket: Socket) => {
       winner: winner,
     });
   });
+
+  
 });
 
 server.listen(3000, () => {

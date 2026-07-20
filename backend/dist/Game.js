@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = exports.GameStatus = void 0;
 const chess_js_1 = require("chess.js");
+const Timer_1 = require("./Timer");
+const _1 = require(".");
 var GameStatus;
 (function (GameStatus) {
     GameStatus["waiting"] = "waiting";
@@ -12,9 +14,11 @@ class Game {
     constructor(id, player1) {
         this.id = id;
         this.status = GameStatus.waiting;
-        ((this.player1 = player1),
-            (this.player2 = null),
-            (this.chess = new chess_js_1.Chess()));
+        this.result = undefined;
+        this.player1 = player1,
+            this.player2 = null,
+            this.chess = new chess_js_1.Chess();
+        this.timer = new Timer_1.Timer(id, 600, 600, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
     }
     makemove({ playerId, move }) {
         var _a, _b;
@@ -44,6 +48,7 @@ class Game {
             console.log("invalid move ", move);
             return null;
         }
+        this.timer.switchTurn(this.chess.turn());
         // 4. Update game status
         if (this.chess.isGameOver()) {
             this.status = GameStatus.ended;
@@ -64,6 +69,22 @@ class Game {
     addPlayer(player) {
         this.player2 = player;
         this.status = GameStatus.inGame;
+        this.timer.start();
+    }
+    ontimeOut(loser) {
+        this.status = 'finished';
+        this.winner = loser == 'w' ? 'b' : 'w';
+        this.result = 'Timeout';
+        _1.io.to(this.id).emit("game-over", {
+            winner: this.winner,
+            result: this.result
+        });
+    }
+    gameTick(whiteTimer, blackTimer) {
+        _1.io.to(this.id).emit("timer-update", {
+            whiteTime: whiteTimer,
+            blackTime: blackTimer
+        });
     }
 }
 exports.Game = Game;

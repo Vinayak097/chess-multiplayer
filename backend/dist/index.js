@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.io = void 0;
 const express_1 = __importDefault(require("express"));
 const uuid_1 = require("uuid");
 const app = (0, express_1.default)();
@@ -11,7 +12,7 @@ const gameManger_1 = require("./gameManger");
 const Game_1 = require("./Game");
 const server = http_1.default.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server, {
+exports.io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
         methods: ["GET", "POST"],
@@ -22,7 +23,7 @@ app.get("/health", (res) => {
     console.log("fine");
     res.json({ message: "hello fine" });
 });
-io.on("connection", (socket) => {
+exports.io.on("connection", (socket) => {
     console.log("a user connected");
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
@@ -95,9 +96,9 @@ io.on("connection", (socket) => {
             winner = game.chess.turn() === "w" ? "b" : "w";
         }
         console.log("emiteted ");
-        const res = io.sockets.adapter.rooms.get(game.id);
+        const res = exports.io.sockets.adapter.rooms.get(game.id);
         console.log("res game paritcipants  ", res);
-        io.to(data.gameId).emit("move-made", {
+        exports.io.to(data.gameId).emit("move-made", {
             gameId: data.gameId,
             fen: game.chess.fen(),
             turn: game.chess.turn(),
