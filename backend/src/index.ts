@@ -64,6 +64,7 @@ io.on("connection", (socket: Socket) => {
       const player2 = result.game.player2!;
       
       player1.socket.emit("game-start", {
+        opponent:{name:"player2",color:result.game.player2?.color},
         gameId: result.game.id,
         playerId:result.game.player1?.id,
         fen: result.game.chess.fen(),
@@ -74,6 +75,7 @@ io.on("connection", (socket: Socket) => {
       console.log(result.game , ' game object')
 
       player2.socket.emit("game-start", {
+        opponent:{name:"player1",color:result.game.player1?.color},
         gameId: result.game.id,
         playerId: result.game.player2?.id,
         fen: result.game.chess.fen(),
@@ -96,6 +98,9 @@ io.on("connection", (socket: Socket) => {
     if (!game) {
       socket.emit("gamenotfound", { receivedGameId: data.gameId });
       return;
+    }
+    if(game.status=='finished'){
+      return
     }
     const move = game.makemove({ playerId: data.playerId, move: data.move });
 
@@ -120,8 +125,31 @@ io.on("connection", (socket: Socket) => {
       winner: winner,
     });
   });
+  socket.on('RESIGN',(data)=>{
+    console.log('recieved resign')
+    const game=gameManager.getGame(data.gameId)
+    if(!game) return
+    const winner = socket.id==game.player1?.socket.id?game.player2?.color:game.player1?.color
+    console.log("winner , " , winner )
+    game.status='finished'
+    game.timer.stop()
+    io.to(game.id).emit('game-over',{
+      winner,
+      result:'resign'
+    })
+  })
+  socket.on('DRAW',(data)=>{
+    console.log("recieved draw")
+    const game=gameManager.getGame(data.gameId)
+    if(!game) return
+    game.timer.stop()
+    game.status='finished'
+    io.to(game.id).emit('game-over',{
+      winner:"none",
+      result:'draw'
+    })    
+  })
 
-  
 });
 
 server.listen(3000, () => {

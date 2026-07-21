@@ -85,6 +85,9 @@ exports.io.on("connection", (socket) => {
             socket.emit("gamenotfound", { receivedGameId: data.gameId });
             return;
         }
+        if (game.status == 'finished') {
+            return;
+        }
         const move = game.makemove({ playerId: data.playerId, move: data.move });
         if (!move) {
             console.log("invalid move ");
@@ -104,6 +107,33 @@ exports.io.on("connection", (socket) => {
             turn: game.chess.turn(),
             gameOver: game.chess.isGameOver(),
             winner: winner,
+        });
+    });
+    socket.on('RESIGN', (data) => {
+        var _a, _b, _c;
+        console.log('recieved resign');
+        const game = gameManager.getGame(data.gameId);
+        if (!game)
+            return;
+        const winner = socket.id == ((_a = game.player1) === null || _a === void 0 ? void 0 : _a.socket.id) ? (_b = game.player2) === null || _b === void 0 ? void 0 : _b.color : (_c = game.player1) === null || _c === void 0 ? void 0 : _c.color;
+        console.log("winner , ", winner);
+        game.status = 'finished';
+        game.timer.stop();
+        exports.io.to(game.id).emit('game-over', {
+            winner,
+            result: 'resign'
+        });
+    });
+    socket.on('DRAW', (data) => {
+        console.log("recieved draw");
+        const game = gameManager.getGame(data.gameId);
+        if (!game)
+            return;
+        game.timer.stop();
+        game.status = 'finished';
+        exports.io.to(game.id).emit('game-over', {
+            winner: "none",
+            result: 'draw'
         });
     });
 });
