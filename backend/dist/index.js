@@ -27,7 +27,7 @@ exports.io.on("connection", (socket) => {
     console.log("a user connected");
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
-        var _a, _b, _c;
+        var _a, _b, _c, _d, _e;
         let data = p;
         if (typeof p == "string") {
             data = JSON.parse(p);
@@ -56,16 +56,18 @@ exports.io.on("connection", (socket) => {
             const player1 = result.game.player1;
             const player2 = result.game.player2;
             player1.socket.emit("game-start", {
+                opponent: { name: "player2", color: (_b = result.game.player2) === null || _b === void 0 ? void 0 : _b.color },
                 gameId: result.game.id,
-                playerId: (_b = result.game.player1) === null || _b === void 0 ? void 0 : _b.id,
+                playerId: (_c = result.game.player1) === null || _c === void 0 ? void 0 : _c.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "w",
             });
             console.log(result.game, ' game object');
             player2.socket.emit("game-start", {
+                opponent: { name: "player1", color: (_d = result.game.player1) === null || _d === void 0 ? void 0 : _d.color },
                 gameId: result.game.id,
-                playerId: (_c = result.game.player2) === null || _c === void 0 ? void 0 : _c.id,
+                playerId: (_e = result.game.player2) === null || _e === void 0 ? void 0 : _e.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "b",

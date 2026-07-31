@@ -202,7 +202,7 @@ const Game = () => {
           </div>
         </div>
 
-        <UserPlayCard player={opponent} yourTurn={turn==opponent.color} timer={blackTimer}></UserPlayCard>
+        <UserPlayCard player={opponent} yourTurn={turn==color} timer={blackTimer}></UserPlayCard>
 
         {/* chessboard */}
         <Chessboard
