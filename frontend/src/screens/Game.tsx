@@ -7,9 +7,8 @@ import UserPlayCard from "@/component/UserPlayCard";
 import { Button } from "@/component/ui/button";
 import Chessboard from "@/component/chessboard";
 import { Undo2, Lightbulb, Handshake, Flag } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Move } from "chess.js";
-
 
 <Flag />;
 const footers = [
@@ -38,6 +37,8 @@ const Footer = {
   previos: "PREVIOS",
 };
 const Game = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+ 
   const [chess, setChess] = useState<any>(null);
   const [board, setBoard] = useState(new Chess().board());
   const [turn, setTurn] = useState("w");
@@ -53,28 +54,33 @@ const Game = () => {
   const [blackTimer, setBlackTimer] = useState<number>(0);
   const [whiteTimer, setWhiteTimer] = useState<number>(0);
   const [next, setNext] = useState<[] | Move[]>([]);
+  
   console.log(color, " color i got");
 
   useEffect(() => {
     socket.on("waiting", (data) => {
       setGameId(data.gameId);
       setPlay(false);
-      console.log(data);
+      setGameState("waiting")
+      
     });
 
     socket.on("game-start", (data) => {
+      console.log("ddata of game start " , data)
       setOpponent(data.opponent)
       setGameId(data.gameId);
       setTurn(data.color);
       setPlay(false);
       setPlayerId(data.playerId);
-      console.log("settled the playerid", data.playerId);
+      
       const newChess = new Chess(data.fen);
       setChess(newChess);
       setBoard(newChess.board());
-      setGameState("");
+      setGameState("playing");
+      searchParams.set('s','playing')
+      setSearchParams()
       setColor(data.color);
-      console.log("data", data);
+      
     });
 
     socket.on("move-made", (data) => {
@@ -95,7 +101,7 @@ const Game = () => {
     });
 
     socket.on("game-over", (data) => {
-      console.log(data, " game over ");
+      
       setWinner(data.winner);
       setResult(data.result);
 
@@ -125,7 +131,7 @@ const Game = () => {
       move,
     });
 
-    console.log("move emited ", move, playerId);
+    
   }
 
   function emits(emit: string) {
@@ -167,15 +173,15 @@ const Game = () => {
         if (move) {
           setNext((prev) => [...prev, move]);
         }
-        console.log("moves undo ", move, "her eis the next array");
+      
         break;
     }
   }
   function cancelMatchmaking() {
-    console.log("game canclesed ");
+    
     navigate("/");
   }
-  console.log("game timing ", whiteTimer, blackTimer);
+  
 
   return (
     <div className=" h-screen  flex  flex-col items-center gap-2 mt-4 m-4">
@@ -202,7 +208,7 @@ const Game = () => {
           </div>
         </div>
 
-        <UserPlayCard player={opponent} yourTurn={turn==color} timer={blackTimer}></UserPlayCard>
+        <UserPlayCard player={opponent} yourTurn={turn==opponent?.color} timer={blackTimer}></UserPlayCard>
 
         {/* chessboard */}
         <Chessboard
@@ -214,7 +220,7 @@ const Game = () => {
           key={3}
         ></Chessboard>
 
-        <UserPlayCard player={color}  yourTurn={turn==color} timer={whiteTimer}></UserPlayCard>
+        <UserPlayCard player={{color,name:"myname"}}  yourTurn={turn==color} timer={whiteTimer}></UserPlayCard>
 
         {/* FOOTER CARDS */}
         <div className=" flex justify-between  gap-2  w-full lg:max-w-sm">
