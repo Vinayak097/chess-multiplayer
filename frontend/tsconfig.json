@@ -12,8 +12,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "baseUrl": ".",
     "jsx": "react-jsx",
-
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "ignoreDeprecations": "6.0",
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

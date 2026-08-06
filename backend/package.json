@@ -1,7 +1,13 @@
 {
   "dependencies": {
+    "@types/express": "^5.0.6",
     "@types/ws": "^8.5.10",
-    "chess.js": "^1.0.0-beta.8",
+    "chess.js": "^1.4.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "install": "^0.13.0",
+    "socket.io": "^4.8.3",
+    "uuid": "^14.0.1",
     "ws": "^8.17.0"
   },
   "name": "chess-multiplayer",
@@ -9,10 +15,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"tsc -b && node dist/index.js"
+    "start": "tsc -b && node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
 }

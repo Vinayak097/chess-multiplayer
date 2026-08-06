@@ -1,88 +1,90 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Game = void 0;
+exports.Game = exports.GameStatus = void 0;
 const chess_js_1 = require("chess.js");
-const message_1 = require("./message");
+const Timer_1 = require("./Timer");
+const _1 = require(".");
+var GameStatus;
+(function (GameStatus) {
+    GameStatus["waiting"] = "waiting";
+    GameStatus["inGame"] = "inGame";
+    GameStatus["ended"] = "ended";
+})(GameStatus || (exports.GameStatus = GameStatus = {}));
 class Game {
-    constructor(player1, player2) {
-        this.moveCount = 0;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.board = new chess_js_1.Chess();
-        this.startTime = new Date();
-        this.player1.send(JSON.stringify({ type: message_1.init__game, payload: { color: "white" } }));
-        this.player2.send(JSON.stringify({ type: message_1.init__game, payload: { color: "black" } }));
+    constructor(id, player1) {
+        this.id = id;
+        this.status = GameStatus.waiting;
+        this.result = undefined;
+        this.player1 = player1,
+            this.player2 = null,
+            this.chess = new chess_js_1.Chess();
+        this.timer = new Timer_1.Timer(id, 600, 600, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
     }
-    makeMove(socket, move) {
+    makemove({ playerId, move }) {
+        var _a, _b;
+        console.log("playerd from move", playerId, move);
+        // 1. Game already ended
+        if (this.status === GameStatus.ended) {
+            console.log("Game has already ended");
+            return;
+        }
+        // 2. Check whose turn it is
+        const turn = this.chess.turn(); // 'w' or 'b'
+        if ((turn === "w" && playerId !== ((_a = this.player1) === null || _a === void 0 ? void 0 : _a.id)) ||
+            (turn === "b" && playerId !== ((_b = this.player2) === null || _b === void 0 ? void 0 : _b.id))) {
+            console.log("not your turn ", playerId);
+            return;
+        }
+        // 3. Make move (guard against chess.js throwing on invalid input)
+        let playedMove = null;
         try {
-            const result = this.board.move({
-                from: move.from,
-                to: move.to
-            });
-            if (!result) {
-                console.log("Invalid move");
-                return;
-            }
-            // Send move to BOTH players
-            const moveMessage = JSON.stringify({
-                type: message_1.Move,
-                payload: {
-                    move: move,
-                    board: this.board.board(),
-                    turn: this.board.turn(),
-                    fen: this.board.fen()
-                }
-            });
-            this.player1.send(moveMessage);
-            this.player2.send(moveMessage);
-            this.moveCount++;
-            console.log("Board after move:\n" + this.board.ascii());
-            // Check for game over
-            if (this.board.isGameOver()) {
-                const winner = this.board.turn() === 'w' ? 'black' : 'white';
-                const gameOverMessage = JSON.stringify({
-                    type: message_1.GAME_OVER,
-                    payload: {
-                        winner: winner,
-                        reason: this.getGameOverReason()
-                    }
-                });
-                this.player1.send(gameOverMessage);
-                this.player2.send(gameOverMessage);
-                console.log(`Game over! Winner: ${winner}`);
-            }
+            playedMove = this.chess.move(move);
         }
-        catch (error) {
-            console.error('Move error:', error);
+        catch (err) {
+            console.log("invalid move (exception)", move, err);
+            return null;
         }
-    }
-    getGameOverReason() {
-        if (this.board.isCheckmate())
-            return "checkmate";
-        if (this.board.isDraw())
-            return "draw";
-        if (this.board.isStalemate())
-            return "stalemate";
-        if (this.board.isThreefoldRepetition())
-            return "threefold repetition";
-        if (this.board.isInsufficientMaterial())
-            return "insufficient material";
-        return "unknown";
-    }
-    isValidMove(from, to) {
-        try {
-            const moves = this.board.moves({ verbose: true });
-            return moves.some(move => move.from === from && move.to === to);
+        if (!playedMove) {
+            console.log("invalid move ", move);
+            return null;
         }
-        catch (_a) {
-            return false;
+        this.timer.switchTurn(this.chess.turn());
+        // 4. Update game status
+        if (this.chess.isGameOver()) {
+            this.status = GameStatus.ended;
         }
+        // 5. Return updated game state
+        return {
+            move: playedMove,
+            fen: this.chess.fen(),
+            turn: this.chess.turn(),
+            gameOver: this.chess.isGameOver(),
+            checkmate: this.chess.isCheckmate(),
+            draw: this.chess.isDraw(),
+            stalemate: this.chess.isStalemate(),
+            insufficientMaterial: this.chess.isInsufficientMaterial(),
+            threefoldRepetition: this.chess.isThreefoldRepetition(),
+        };
     }
-    getCurrentTurn() {
-        return this.board.turn() === 'w' ? 'white' : 'black';
+    addPlayer(player) {
+        this.player2 = player;
+        this.status = GameStatus.inGame;
+        this.timer.start();
     }
-    getGameDuration() {
-        return Date.now() - this.startTime.getTime();
+    ontimeOut(loser) {
+        this.status = 'finished';
+        this.winner = loser == 'w' ? 'b' : 'w';
+        this.result = 'Timeout';
+        _1.io.to(this.id).emit("game-over", {
+            winner: this.winner,
+            result: this.result
+        });
+    }
+    gameTick(whiteTimer, blackTimer) {
+        _1.io.to(this.id).emit("timer-update", {
+            whiteTime: whiteTimer,
+            blackTime: blackTimer
+        });
     }
 }
 exports.Game = Game;
