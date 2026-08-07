@@ -208,7 +208,7 @@ const Game = () => {
           </div>
         </div>
 
-        <UserPlayCard player={opponent} yourTurn={turn==opponent?.color} timer={blackTimer}></UserPlayCard>
+        <UserPlayCard player={opponent} yourTurn={turn==opponent?.color} timer={opponent.color=='w'?whiteTimer:blackTimer}></UserPlayCard>
 
         {/* chessboard */}
         <Chessboard
@@ -221,7 +221,7 @@ const Game = () => {
           key={3}
         ></Chessboard>
 
-        <UserPlayCard player={{color,name:"myname"}}  yourTurn={turn==color} timer={whiteTimer}></UserPlayCard>
+        <UserPlayCard player={{color,name:"myname"}}  yourTurn={turn==color} timer={ color=='w'?whiteTimer:blackTimer}></UserPlayCard>
 
         {/* FOOTER CARDS */}
         <div className=" flex justify-between  gap-2  w-full lg:max-w-sm">
