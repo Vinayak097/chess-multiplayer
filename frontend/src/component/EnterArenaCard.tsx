@@ -8,8 +8,9 @@ import {
   CardTitle,
 } from "@/component/ui/card"
 import { Button } from "@/component/ui/button";
+import { GameType } from "@/pages/Home";
 
-const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
+const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:GameType)=>void}) => {
   
   return (
     <Card className="bg-[#111214] text-max-xl  rounded-none border-b border-zinc-800  p-2 px-5 pb-5 md:w-ful w-full">
@@ -38,7 +39,7 @@ const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:string)=>void}) => {
       </CardContent>
       
       <CardFooter>
-        <Button onClick={()=>quickPlay("r apid")} className="text-black font-bold tracking-wider text-xs bg-orange-500 rounded-none clip-tactical rounded-bl-sm rounded-tr-sm p-2">
+        <Button onClick={()=>quickPlay("Rapid" as GameType)} className="text-black font-bold tracking-wider text-xs bg-orange-500 rounded-none clip-tactical rounded-bl-sm rounded-tr-sm p-2">
           QUICK MATCH
         </Button>
       </CardFooter>

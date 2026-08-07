@@ -30,6 +30,17 @@ class Timer {
             }
         }, 1000);
     }
+    incrementTime(color, time) {
+        if (color == 'w') {
+            this.whiteTime += time;
+        }
+        else {
+            this.blackTime += time;
+        }
+        this.gameTick(this.whiteTime, this.blackTime, this.gameId);
+    }
+    decrementTime(gameId, playerId, time) {
+    }
     switchTurn(p) {
         this.currentplayer = p;
     }

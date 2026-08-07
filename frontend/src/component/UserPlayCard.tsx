@@ -21,7 +21,7 @@ const UserPlayCard = ({yourTurn, timer , player }: {yourTurn:boolean, timer: num
                 <span className='text-orange-600'>{yourTurn && "Your Turn"}</span>
                 
                 <h1>CyberTal04</h1>
-                
+              
             </div>
         </div>
         <div>

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 const app = express();
 import { Response } from "express";
 import http from "http";
-import { GameManager } from "./gameManger";
+import { GameManager, GameType } from "./gameManger";
 import { GameStatus } from "./Game";
 import { Socket } from "socket.io";
 import { Move } from "chess.js";
@@ -32,18 +32,19 @@ app.get("/health", (res: Response) => {
 io.on("connection", (socket: Socket) => {
   console.log("a user connected");
   socket.emit("a user is connected");
-  socket.on("join-game", (p: { id: string }) => {
+  socket.on("join-game", (p: { id: string,gametype:GameType }) => {
     let data = p;
     if (typeof p == "string") {
       data = JSON.parse(p);
     }
     console.log(p, "joing game recienved", p.id);
+    const gametype = p.gametype ?? (p as any).type;
     const player = {
       id: p.id || uuidv4(),
       color: "w",
       socket: socket,
     };
-    const result = gameManager.joinGame(player);
+    const result = gameManager.joinGame(player, gametype);
     if (result == null) {
       return;
     }

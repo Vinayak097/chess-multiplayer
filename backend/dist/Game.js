@@ -11,19 +11,30 @@ var GameStatus;
     GameStatus["ended"] = "ended";
 })(GameStatus || (exports.GameStatus = GameStatus = {}));
 class Game {
-    constructor(id, player1) {
+    constructor(id, player1, gametype) {
         this.id = id;
         this.status = GameStatus.waiting;
         this.result = undefined;
         this.player1 = player1,
+            this.gametype = gametype,
             this.player2 = null,
             this.chess = new chess_js_1.Chess();
-        this.timer = new Timer_1.Timer(id, 600, 600, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+        if (gametype == "Blitz") {
+            this.timer = new Timer_1.Timer(id, 180, 180, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+        }
+        else if (gametype == "Bullet") {
+            this.timer = new Timer_1.Timer(id, 60, 60, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+        }
+        else {
+            this.timer = new Timer_1.Timer(id, 600, 600, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+        }
     }
     makemove({ playerId, move }) {
         var _a, _b;
         console.log("playerd from move", playerId, move);
         // 1. Game already ended
+        if (playerId == null)
+            return;
         if (this.status === GameStatus.ended) {
             console.log("Game has already ended");
             return;
@@ -47,6 +58,15 @@ class Game {
         if (!playedMove) {
             console.log("invalid move ", move);
             return null;
+        }
+        let time;
+        if (this.gametype == "Blitz") {
+            time = 2;
+            this.timer.incrementTime(playerId, time);
+        }
+        else if (this.gametype == "Rapid") {
+        }
+        else {
         }
         this.timer.switchTurn(this.chess.turn());
         // 4. Update game status

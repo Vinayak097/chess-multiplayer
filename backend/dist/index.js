@@ -27,25 +27,26 @@ exports.io.on("connection", (socket) => {
     console.log("a user connected");
     socket.emit("a user is connected");
     socket.on("join-game", (p) => {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f;
         let data = p;
         if (typeof p == "string") {
             data = JSON.parse(p);
         }
         console.log(p, "joing game recienved", p.id);
+        const gametype = (_a = p.gametype) !== null && _a !== void 0 ? _a : p.type;
         const player = {
             id: p.id || (0, uuid_1.v4)(),
             color: "w",
             socket: socket,
         };
-        const result = gameManager.joinGame(player);
+        const result = gameManager.joinGame(player, gametype);
         if (result == null) {
             return;
         }
         console.log(result.game.status == Game_1.GameStatus.waiting, " waiting check");
         if (result.game.status == Game_1.GameStatus.waiting) {
             console.log("emiteing the player 1");
-            (_a = result.game.player1) === null || _a === void 0 ? void 0 : _a.socket.emit("waiting", {
+            (_b = result.game.player1) === null || _b === void 0 ? void 0 : _b.socket.emit("waiting", {
                 gameId: result.game.id,
             });
             socket.join(result.game.id);
@@ -56,18 +57,18 @@ exports.io.on("connection", (socket) => {
             const player1 = result.game.player1;
             const player2 = result.game.player2;
             player1.socket.emit("game-start", {
-                opponent: { name: "player2", color: (_b = result.game.player2) === null || _b === void 0 ? void 0 : _b.color },
+                opponent: { name: "player2", color: (_c = result.game.player2) === null || _c === void 0 ? void 0 : _c.color },
                 gameId: result.game.id,
-                playerId: (_c = result.game.player1) === null || _c === void 0 ? void 0 : _c.id,
+                playerId: (_d = result.game.player1) === null || _d === void 0 ? void 0 : _d.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "w",
             });
             console.log(result.game, ' game object');
             player2.socket.emit("game-start", {
-                opponent: { name: "player1", color: (_d = result.game.player1) === null || _d === void 0 ? void 0 : _d.color },
+                opponent: { name: "player1", color: (_e = result.game.player1) === null || _e === void 0 ? void 0 : _e.color },
                 gameId: result.game.id,
-                playerId: (_e = result.game.player2) === null || _e === void 0 ? void 0 : _e.id,
+                playerId: (_f = result.game.player2) === null || _f === void 0 ? void 0 : _f.id,
                 fen: result.game.chess.fen(),
                 turn: result.game.chess.turn(),
                 color: "b",

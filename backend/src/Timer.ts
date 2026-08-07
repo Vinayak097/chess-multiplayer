@@ -35,6 +35,17 @@ export class Timer{
             }
         },1000)
     }
+    incrementTime(color:string,time:number){
+        if(color=='w'){
+            this.whiteTime+=time;
+        }else{
+            this.blackTime+=time;
+        }
+        this.gameTick(this.whiteTime,this.blackTime,this.gameId)
+    }
+    decrementTime(gameId:string,playerId:string, time:string){
+
+    }
 
     switchTurn(p:'w'|'b'){
         this.currentplayer=p

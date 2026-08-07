@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/component/ui/card"
+import { GameType } from "@/pages/Home";
 import { socket } from "@/socket";
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -14,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 interface PlaycardProp{
   icon: IconProp;
-  title: string;
+  title: GameType;
   time: string;
   players: string;
   description: string;
@@ -23,7 +24,7 @@ interface PlaycardProp{
 const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => {
   const navigate=useNavigate()
   return (
-    <Card  onClick={()=>{socket.emit('join-game',{id:crypto.randomUUID(),type:title}) 
+    <Card  onClick={()=>{socket.emit('join-game',{id:crypto.randomUUID(),gametype:title}) 
     navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all rounded-none bg-black lg:w-55 h-40 ">
       <CardHeader>
         <CardTitle>

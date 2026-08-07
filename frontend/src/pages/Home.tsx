@@ -10,37 +10,35 @@ import { useNavigate } from 'react-router-dom';
 const gameModes = [
   {
     icon: faZap,
-    title: "Bullet",
+    title: "Bullet" as GameType,
     description: "Blink and you lose.",
     time: "1 + 0",
     players: "12,481",
   },
   {
     icon: faClock,
-    title: "Blitz",
+    title: "Blitz" as GameType,
     description: "Fast, punchy, ruthless.",
     time: "3 + 2",
     players: "24,902",
   },
   {
     icon: faBolt,
-    title: "Rapid",
+    title: "Rapid" as GameType,
     description: "Think before moving.",
     time: "10 + 0",
     players: "8,451",
   },
 ];
-interface GameType{
-   
-}
+export type GameType = "Rapid" | "Blitz" | "Bullet";
+
 const Home = () => {
   const navigate=useNavigate()
   const playerId=crypto.randomUUID()
-  function quickPlay(gametype:string){
+  function quickPlay(gametype:GameType){
     socket.emit('join-game',{
       id: playerId,
-      
-      type:gametype
+      gametype:gametype
     })
     navigate(`/game?s=waiting&&playerId=${playerId}`)
   }
@@ -53,8 +51,8 @@ const Home = () => {
 
 <div className="w-full sm:max-w-md">
   <div className="grid grid-cols-2 gap-2 justify-between pt-2">
-    {gameModes.map((gamemode) => (
-      <PlayCards key={gamemode.title} {...gamemode} />
+    {gameModes.map((gamemode,index) => (
+      <PlayCards key={index} {...gamemode} />
     ))}
   </div>
 </div>
