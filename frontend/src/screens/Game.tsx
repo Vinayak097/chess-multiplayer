@@ -47,7 +47,7 @@ const Game = () => {
   const navigate = useNavigate();
   const [opponent,setOpponent]=useState<any>()
   const [playerId, setPlayerId] = useState("");
-  const [color, setColor] = useState<"w" | "b">();
+  const [color, setColor] = useState<"w" | "b">("w");
   const [winner, setWinner] = useState<string>("");
   const [play, setPlay] = useState(true);
   const [result, setResult] = useState("");
@@ -212,6 +212,7 @@ const Game = () => {
 
         {/* chessboard */}
         <Chessboard
+        color={color}
           board={board}
           chess={chess}
           currentTurn={turn}

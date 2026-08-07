@@ -23,8 +23,9 @@ const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   return pieceMap[piece.color + piece.type];
 };
 
-const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn, }: {
+const Chessboard = ({color:_color, chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn, }: {
   chess: any,
+  color:string,
   socket: Socket,
   board: ({
     square: Square,
@@ -35,6 +36,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   currentTurn: string,
   
 }) => {
+
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [winner, setWinner] = useState<null | string>();
   const handleSquareClick = (square: string) => {
@@ -62,7 +64,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
   }, [board]);
   const ismobile=useIsMobile()
   return (
-    <div className=''>
+    <div className={`border-4 border-black inline-block ${_color === "b" ? "board-wrapper black" : "board-wrapper"}`}>
     <div className="border-4 border-black  inline-block ">
       {winner && (
         <div className='m-4'>
@@ -70,7 +72,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
         </div>
       )}
       {board.map((row, i) => (
-        <div key={i} className='flex w-full '>
+        <div key={i} className={`flex w-full board`}>
           {row.map((square, j) => {
             const squareId = String.fromCharCode(97 + j) + String(8 - i);
             const squareBgClass = selectedSquare === squareId
@@ -82,7 +84,7 @@ const Chessboard = ({ chess: _chess, socket: _socket, board, onMove, currentTurn
               <div 
                 key={`${i}-${j}-${square?.type || 'empty'}`} // Force re-render with piece type
                 onClick={() => handleSquareClick(squareId)}
-                className={`w-10 h-10 lg:h-12 lg:w-12 flex items-center justify-center text-4xl ${squareBgClass}`}
+                className={`piece w-10 h-10 lg:h-12 lg:w-12 flex items-center justify-center text-4xl ${squareBgClass}`}
               >
                 {square && 
                   <FontAwesomeIcon 

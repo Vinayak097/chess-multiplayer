@@ -134,3 +134,17 @@
     @apply font-sans;
     }
 }
+
+.board {
+  /* normal board */
+}
+
+.board-wrapper.black {
+  transform: rotate(180deg);
+  transform-origin: center;
+}
+
+.board-wrapper.black .piece {
+  transform: rotate(180deg);
+  transform-origin: center;
+}
