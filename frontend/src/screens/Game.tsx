@@ -204,7 +204,7 @@ const Game = () => {
           </div>
         </div>
 
-        <UserPlayCard player={opponent} yourTurn={turn==opponent?.color} timer={opponent.color=='w'?whiteTimer:blackTimer}></UserPlayCard>
+        <UserPlayCard player={opponent} yourTurn={turn==opponent?.color} timer={opponent?.color=='w'?whiteTimer:blackTimer}></UserPlayCard>
 
         {/* chessboard */}
         <Chessboard
