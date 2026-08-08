@@ -1,9 +1,6 @@
-import React from 'react'
 import PlayCards from '../component/PlayCards'
 import { faZap, faClock, faBolt } from '@fortawesome/free-solid-svg-icons';
 import EnterArenaCard from '@/component/EnterArenaCard';
-import { MoveLeft } from 'lucide-react';
-import { Socket } from 'socket.io-client';
 import { socket } from '@/socket';
 import { useNavigate } from 'react-router-dom';
 

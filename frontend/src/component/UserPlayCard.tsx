@@ -1,6 +1,5 @@
 import { useIsMobile } from '@/hooks/use-mobile'
 import { UserRoundArrowLeft } from 'lucide-react'
-import React from 'react'
 
 
 const formatTimer = (seconds: number) => {

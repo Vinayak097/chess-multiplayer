@@ -6,11 +6,9 @@ import { MoveLeft, Redo2 } from "lucide-react";
 import UserPlayCard from "@/component/UserPlayCard";
 import { Button } from "@/component/ui/button";
 import Chessboard from "@/component/chessboard";
-import { Undo2, Lightbulb, Handshake, Flag } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Undo2, Handshake, Flag } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Move } from "chess.js";
-
-<Flag />;
 const footers = [
   {
     icon: <Undo2></Undo2>,
@@ -50,7 +48,6 @@ const Game = () => {
   const [color, setColor] = useState<"w" | "b">("w");
   const [winner, setWinner] = useState<string>("");
   const [play, setPlay] = useState(true);
-  const [result, setResult] = useState("");
   const [blackTimer, setBlackTimer] = useState<number>(0);
   const [whiteTimer, setWhiteTimer] = useState<number>(0);
   const [next, setNext] = useState<[] | Move[]>([]);
@@ -58,14 +55,14 @@ const Game = () => {
   console.log(color, " color i got");
 
   useEffect(() => {
-    socket.on("waiting", (data) => {
+    socket.on("waiting", (data: any) => {
       setGameId(data.gameId);
       setPlay(false);
       setGameState("waiting")
       
     });
 
-    socket.on("game-start", (data) => {
+    socket.on("game-start", (data: any) => {
       console.log("ddata of game start " , data)
       setOpponent(data.opponent)
       setGameId(data.gameId);
@@ -83,7 +80,7 @@ const Game = () => {
       
     });
 
-    socket.on("move-made", (data) => {
+    socket.on("move-made", (data: any) => {
       const chess = new Chess(data.fen);
       setChess(chess);
       setBoard(chess.board());
@@ -100,10 +97,9 @@ const Game = () => {
       }
     });
 
-    socket.on("game-over", (data) => {
+    socket.on("game-over", (data: any) => {
       
       setWinner(data.winner);
-      setResult(data.result);
 
       setGameState("finished");
       setTimeout(() => {
@@ -112,7 +108,7 @@ const Game = () => {
         setPlay(true);
       }, 3000);
     });
-    socket.on("timer-update", (data) => {
+    socket.on("timer-update", (data: any) => {
       setWhiteTimer(data.whiteTime);
       setBlackTimer(data.blackTime);
     });
