@@ -13,6 +13,7 @@ const EnterArenaCard = ({quickPlay}:{quickPlay:(gametype:GameType)=>void}) => {
   
   return (
     <Card className="bg-[#111214] text-max-xl  rounded-none border-b border-zinc-800  p-2 px-5 pb-5 md:w-ful w-full">
+      
       <CardHeader className="border-b flex justify-between p-0  h-[10px] rounded-0">
         <h1 className="text-orange-500 w-fit"> // Briefing_01</h1>
         <div className="text-gray-500">

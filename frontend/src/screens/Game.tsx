@@ -190,9 +190,12 @@ const Game = () => {
             <Button
               disabled={!play}
               className="bg-black text-white flex gap-2 rounded-none"
+              onClick={()=>{
+                navigate('/')
+              }}
             >
               <MoveLeft />
-              <span className="text-xs sm:text-base">EXTRACT</span>
+              <span  className="text-xs sm:text-base">EXTRACT</span>
             </Button>
           </div>
           <div className="relative flex items-center gap-2 border border-orange-600 px-2 py-1">

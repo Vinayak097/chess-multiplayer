@@ -15,18 +15,18 @@ class Game {
         this.id = id;
         this.status = GameStatus.waiting;
         this.result = undefined;
-        this.player1 = player1,
-            this.gametype = gametype,
-            this.player2 = null,
-            this.chess = new chess_js_1.Chess();
+        ((this.player1 = player1),
+            (this.gametype = gametype),
+            (this.player2 = null),
+            (this.chess = new chess_js_1.Chess()));
         if (gametype == "Blitz") {
-            this.timer = new Timer_1.Timer(id, 180, 180, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+            this.timer = new Timer_1.Timer(id, 180, 180, "w", (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
         }
         else if (gametype == "Bullet") {
-            this.timer = new Timer_1.Timer(id, 60, 60, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+            this.timer = new Timer_1.Timer(id, 60, 60, "w", (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
         }
         else {
-            this.timer = new Timer_1.Timer(id, 600, 600, 'w', (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
+            this.timer = new Timer_1.Timer(id, 600, 600, "w", (gameId, loser) => this.ontimeOut(loser), (whiteTimer, blackTimer) => this.gameTick(whiteTimer, blackTimer));
         }
     }
     makemove({ playerId, move }) {
@@ -62,7 +62,7 @@ class Game {
         let time;
         if (this.gametype == "Blitz") {
             time = 2;
-            this.timer.incrementTime(playerId, time);
+            this.timer.incrementTime(turn, time);
         }
         else if (this.gametype == "Rapid") {
         }
@@ -92,18 +92,18 @@ class Game {
         this.timer.start();
     }
     ontimeOut(loser) {
-        this.status = 'finished';
-        this.winner = loser == 'w' ? 'b' : 'w';
-        this.result = 'Timeout';
+        this.status = "finished";
+        this.winner = loser == "w" ? "b" : "w";
+        this.result = "Timeout";
         _1.io.to(this.id).emit("game-over", {
             winner: this.winner,
-            result: this.result
+            result: this.result,
         });
     }
     gameTick(whiteTimer, blackTimer) {
         _1.io.to(this.id).emit("timer-update", {
             whiteTime: whiteTimer,
-            blackTime: blackTimer
+            blackTime: blackTimer,
         });
     }
 }
