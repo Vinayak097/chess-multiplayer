@@ -24,8 +24,7 @@ interface PlaycardProp{
 const PlayCards = ({ icon, title, time, players,description }: PlaycardProp) => {
   const navigate=useNavigate()
   return (
-    <Card  onClick={()=>{socket.emit('join-game',{id:crypto.randomUUID(),gametype:title}) 
-    navigate(`/game?waiting`)}} className="border cursor-pointer hover:opacity-50 transition-all rounded-none bg-black lg:w-55 h-40 ">
+    <Card  onClick={()=>{const playerId = crypto.randomUUID(); socket.emit('join-game',{id:playerId,gametype:title}); navigate(`/game?s=waiting&playerId=${playerId}`)}} className="mode-card">
       <CardHeader>
         <CardTitle>
           <FontAwesomeIcon

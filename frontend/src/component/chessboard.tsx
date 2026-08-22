@@ -1,10 +1,7 @@
-import { Color, PieceSymbol, Square } from 'chess.js';
+import { Chess, Color, PieceSymbol, Square } from 'chess.js';
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChessKing, faChessQueen, faChessRook, faChessBishop, faChessKnight, faChessPawn } from '@fortawesome/free-solid-svg-icons';
-import { Socket } from 'socket.io-client';
-import { useIsMobile } from '@/hooks/use-mobile';
-
 const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   const pieceMap: { [key: string]: any } = {
     'wk': faChessKing,
@@ -23,10 +20,9 @@ const getPieceIcon = (piece: { type: PieceSymbol, color: Color }) => {
   return pieceMap[piece.color + piece.type];
 };
 
-const Chessboard = ({color:_color, chess: _chess, socket: _socket, board, onMove, currentTurn: _currentTurn, }: {
-  chess: any,
+const Chessboard = ({color:_color, chess: _chess, board, onMove, currentTurn: _currentTurn, }: {
+  chess: Chess | null,
   color:string,
-  socket: Socket,
   board: ({
     square: Square,
     type: PieceSymbol,
@@ -38,60 +34,56 @@ const Chessboard = ({color:_color, chess: _chess, socket: _socket, board, onMove
 }) => {
 
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
-  const [winner, setWinner] = useState<null | string>();
+  const [legalSquares, setLegalSquares] = useState<string[]>([]);
   const handleSquareClick = (square: string) => {
-    console.log('selectedsquare', selectedSquare, square)
+    if (!_chess || _chess.turn() !== _currentTurn) return;
+    const chessSquare = square as Square;
+    const piece = _chess.get(chessSquare);
     if (!selectedSquare) {
+      if (!piece || piece.color !== _color) return;
       setSelectedSquare(square);
-    } else {
-
-      onMove({
-        from: selectedSquare,
-        to: square
-      });
-      setSelectedSquare(null);
+      setLegalSquares(_chess.moves({ square: chessSquare, verbose: true }).map((move: { to: string }) => move.to));
+      return;
     }
+
+    if (square === selectedSquare) {
+      setSelectedSquare(null);
+      setLegalSquares([]);
+      return;
+    }
+
+    if (piece?.color === _color) {
+      setSelectedSquare(square);
+      setLegalSquares(_chess.moves({ square: chessSquare, verbose: true }).map((move: { to: string }) => move.to));
+      return;
+    }
+
+    if (legalSquares.includes(square)) onMove({ from: selectedSquare, to: square });
+    setSelectedSquare(null);
+    setLegalSquares([]);
   };
 
   // Force re-render when board changes
   useEffect(() => {
-    console.log("Board updated in Chessboard:", board); // Debug log
-    
-    if (_chess?.isCheckmate()) {
-      const winner = _chess.turn() === "w" ? "b" : "w";
-      setWinner(winner)
-    }
   }, [board]);
-  const ismobile=useIsMobile()
   return (
-    <div className={`border-4 border-black inline-block ${_color === "b" ? "board-wrapper black" : "board-wrapper"}`}>
-    <div className="border-4 border-black  inline-block ">
-      {winner && (
-        <div className='m-4'>
-          {winner} player Won
-        </div>
-      )}
+    <div className={`board-wrapper ${_color === "b" ? "black" : ""}`}>
       {board.map((row, i) => (
-        <div key={i} className={`flex w-full board`}>
+        <div key={i} className="flex w-full board">
           {row.map((square, j) => {
             const squareId = String.fromCharCode(97 + j) + String(8 - i);
-            const squareBgClass = selectedSquare === squareId
-              ? 'bg-blue-400'
-              : (i + j) % 2 === 0
-                ? 'bg-zinc-700'
-                : 'bg-black-500';
+            const isLegal = legalSquares.includes(squareId);
+            const squareBgClass = selectedSquare === squareId ? 'selected' : (i + j) % 2 === 0 ? 'light-square' : 'dark-square';
             return (
               <div 
-                key={`${i}-${j}-${square?.type || 'empty'}`} // Force re-render with piece type
+                key={`${i}-${j}`}
                 onClick={() => handleSquareClick(squareId)}
-                className={`piece w-10 h-10 lg:h-12 lg:w-12 flex items-center justify-center text-4xl ${squareBgClass}`}
+                className={`piece ${squareBgClass} ${isLegal ? 'legal-square' : ''}`}
               >
                 {square && 
                   <FontAwesomeIcon 
-                  height={ismobile?8:50}
-                  width={ismobile?20:50}
                     icon={getPieceIcon(square)} 
-                    className={`${square.color === 'w' ? 'text-orange-600' : 'text-white'}`}
+                    className={`${square.color === 'w' ? 'piece-white' : 'piece-black'}`}
                   />
                 }
               </div>
@@ -99,7 +91,6 @@ const Chessboard = ({color:_color, chess: _chess, socket: _socket, board, onMove
           })}
         </div>
       ))}
-    </div>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import { useIsMobile } from '@/hooks/use-mobile'
-import { UserRoundArrowLeft } from 'lucide-react'
+import { UserRound } from 'lucide-react'
 
 
 const formatTimer = (seconds: number) => {
@@ -9,22 +8,26 @@ const formatTimer = (seconds: number) => {
   return `${minutes}:${paddedSeconds}`
 }
 
-const UserPlayCard = ({yourTurn, timer , player }: {yourTurn:boolean, timer: number,player:any }) => {
-    const ismobile = useIsMobile()
-    console.log(yourTurn, ' yourtrun',player) 
+type Player = { color?: string; name?: string };
+
+const UserPlayCard = ({yourTurn, timer , player }: {yourTurn:boolean, timer: number,player?: Player }) => {
+    const displayName = player?.name || (player?.color === 'b' ? 'Black player' : 'White player')
   return (
-    <div  className='border w-full lg:max-w-sm bg-black flex justify-between p-1 px-2 items-center h-12 lg:max-h-18 border-orange-500'>
+    <div className={`player-card ${yourTurn ? 'player-card-active' : ''}`}>
         <div className='flex gap-3 items-center '>
-            <UserRoundArrowLeft className='border p-1 size-4/4 border-orange-500 ' height={ismobile?30:35} width={ismobile?30:35}/>
+        <UserRound className='player-icon' />
         <div className='text-xs lg:text-md'>   
-                <span className='text-orange-600'>{yourTurn && "Your Turn"}</span>
+          <span className='turn-label'>{yourTurn ? "Your turn" : ""}</span>
                 
-                <h1>CyberTal04</h1>
+          <h1>{displayName}</h1>
               
             </div>
         </div>
         <div>
-            <span className='text-green-400 text-sm lg:text-md'>{formatTimer(timer)}</span>
+            <div className="clock-wrap">
+              <span className="clock-label">{yourTurn ? "PLAYING" : "CLOCK"}</span>
+              <span className={`timer ${timer <= 10 ? "timer-danger" : ""}`}>{formatTimer(timer)}</span>
+            </div>
         </div>
     </div>
   )

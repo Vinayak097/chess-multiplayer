@@ -23,6 +23,7 @@ export const io = new Server(server, {
   },
 });
 const gameManager = new GameManager();
+const drawOffers = new Map<string, string>();
 
 app.get("/health", (res: Response) => {
   console.log("fine");
@@ -32,7 +33,7 @@ app.get("/health", (res: Response) => {
 io.on("connection", (socket: Socket) => {
   console.log("a user connected");
   socket.emit("a user is connected");
-  socket.on("join-game", (p: { id: string,gametype:GameType }) => {
+  socket.on("join-game", (p: { id: string; gametype: GameType }) => {
     let data = p;
     if (typeof p == "string") {
       data = JSON.parse(p);
@@ -59,29 +60,32 @@ io.on("connection", (socket: Socket) => {
       return;
     }
     if (result.game.status == GameStatus.inGame) {
-      
       socket.join(result.game.id);
       const player1 = result.game.player1!;
       const player2 = result.game.player2!;
-      
+
       player1.socket.emit("game-start", {
-        opponent:{name:"player2",color:result.game.player2?.color},
+        opponent: { name: "player2", color: result.game.player2?.color },
         gameId: result.game.id,
-        playerId:result.game.player1?.id,
+        playerId: result.game.player1?.id,
         fen: result.game.chess.fen(),
         turn: result.game.chess.turn(),
         color: "w",
+        whiteTime: result.game.timer.whiteTime,
+        blackTime: result.game.timer.blackTime,
       });
-      
-      console.log(result.game , ' game object')
+
+      console.log(result.game, " game object");
 
       player2.socket.emit("game-start", {
-        opponent:{name:"player1",color:result.game.player1?.color},
+        opponent: { name: "player1", color: result.game.player1?.color },
         gameId: result.game.id,
         playerId: result.game.player2?.id,
         fen: result.game.chess.fen(),
         turn: result.game.chess.turn(),
         color: "b",
+        whiteTime: result.game.timer.whiteTime,
+        blackTime: result.game.timer.blackTime,
       });
       return;
     }
@@ -100,8 +104,8 @@ io.on("connection", (socket: Socket) => {
       socket.emit("gamenotfound", { receivedGameId: data.gameId });
       return;
     }
-    if(game.status=='finished'){
-      return
+    if (game.status == "finished") {
+      return;
     }
     const move = game.makemove({ playerId: data.playerId, move: data.move });
 
@@ -124,33 +128,74 @@ io.on("connection", (socket: Socket) => {
       turn: game.chess.turn(),
       gameOver: game.chess.isGameOver(),
       winner: winner,
+      move: move.move,
+      history: game.chess.history(),
     });
   });
-  socket.on('RESIGN',(data)=>{
-    console.log('recieved resign')
-    const game=gameManager.getGame(data.gameId)
-    if(!game) return
-    const winner = socket.id==game.player1?.socket.id?game.player2?.color:game.player1?.color
-    console.log("winner , " , winner )
-    game.status='finished'
-    game.timer.stop()
-    io.to(game.id).emit('game-over',{
+  socket.on("RESIGN", (data) => {
+    console.log("recieved resign");
+    const game = gameManager.getGame(data.gameId);
+    if (!game) return;
+    const winner =
+      socket.id == game.player1?.socket.id
+        ? game.player2?.color
+        : game.player1?.color;
+    console.log("winner , ", winner);
+    game.status = "finished";
+    game.timer.stop();
+    io.to(game.id).emit("game-over", {
       winner,
-      result:'resign'
-    })
-  })
-  socket.on('DRAW',(data)=>{
-    console.log("recieved draw")
-    const game=gameManager.getGame(data.gameId)
-    if(!game) return
-    game.timer.stop()
-    game.status='finished'
-    io.to(game.id).emit('game-over',{
-      winner:"none",
-      result:'draw'
-    })    
-  })
+      result: "resign",
+    });
+  });
+  socket.on("DRAW", (data) => {
+    const game = gameManager.getGame(data.gameId);
+    if (!game || game.status !== GameStatus.inGame) return;
+    const player =
+      game.player1?.socket.id === socket.id
+        ? game.player1
+        : game.player2?.socket.id === socket.id
+          ? game.player2
+          : null;
+    const opponent = player === game.player1 ? game.player2 : game.player1;
+    if (!player || !opponent || drawOffers.has(game.id)) return;
 
+    drawOffers.set(game.id, socket.id);
+    opponent.socket.emit("draw-offered", { from: player.color });
+    socket.emit("draw-offer-sent");
+  });
+  socket.on("DRAW_ACCEPT", (data) => {
+    const game = gameManager.getGame(data.gameId);
+    const offererSocketId = drawOffers.get(data.gameId);
+    if (
+      !game ||
+      game.status !== GameStatus.inGame ||
+      !offererSocketId ||
+      offererSocketId === socket.id
+    )
+      return;
+
+    drawOffers.delete(game.id);
+    game.timer.stop();
+    game.status = GameStatus.ended;
+    io.to(game.id).emit("game-over", { winner: "none", result: "draw" });
+  });
+  socket.on("DRAW_DECLINE", (data) => {
+    const game = gameManager.getGame(data.gameId);
+    const offererSocketId = drawOffers.get(data.gameId);
+    if (!game || !offererSocketId || offererSocketId === socket.id) return;
+
+    drawOffers.delete(game.id);
+    io.to(offererSocketId).emit("draw-declined");
+    socket.emit("draw-declined");
+  });
+  socket.on("DRAW_CANCEL", (data) => {
+    const game = gameManager.getGame(data.gameId);
+    if (game && drawOffers.get(game.id) === socket.id) {
+      drawOffers.delete(game.id);
+      socket.emit("draw-declined");
+    }
+  });
 });
 
 server.listen(3000, () => {

@@ -31,8 +31,8 @@ export type GameType = "Rapid" | "Blitz" | "Bullet";
 
 const Home = () => {
   const navigate=useNavigate()
-  const playerId=crypto.randomUUID()
   function quickPlay(gametype:GameType){
+    const playerId = crypto.randomUUID()
     socket.emit('join-game',{
       id: playerId,
       gametype:gametype
@@ -41,20 +41,29 @@ const Home = () => {
   }
 
   return (
-    <div className='border  h-screen flex  flex-col items-center justify-center p-4'>
-<div className="w-full sm:max-w-md">
+    <main className='home-shell'>
+      <div className="home-grid">
+        <section className="home-intro">
+          <div className="eyebrow"><span className="status-dot" /> NODE // 07 ONLINE</div>
+          <h1>Find your<br /><em>next move.</em></h1>
+          <p>Competitive chess for sharp minds. Pick a clock, enter the queue, and make the board yours.</p>
+          <div className="intro-meta"><span>LIVE QUEUE</span><strong>2,431</strong><span>PLAYERS ACTIVE</span></div>
+        </section>
+        <section className="home-controls">
+          <div className="w-full">
   <EnterArenaCard quickPlay={quickPlay} />
 </div>
-
-<div className="w-full sm:max-w-md">
-  <div className="grid grid-cols-2 gap-2 justify-between pt-2">
+<div className="w-full">
+  <div className="mode-grid">
     {gameModes.map((gamemode,index) => (
       <PlayCards key={index} {...gamemode} />
     ))}
   </div>
 </div>
-      
-    </div>
+        </section>
+      </div>
+      <footer className="home-footer"><span>CHESS / MULTIPLAYER</span><span>EST. 2026</span><span>BUILT FOR THE BOLD</span></footer>
+    </main>
   )
 }
 
